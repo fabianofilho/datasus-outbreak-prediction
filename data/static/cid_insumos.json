@@ -1,0 +1,114 @@
+{
+  "_fonte": "Protocolos Clinicos e Diretrizes Terapeuticas do Ministerio da Saude (PCDT/MS) e RENAME 2022",
+  "_unidade": "consumo_medio_por_caso em unidades padrao (comprimido, frasco, ampola, unidade)",
+  "A00": {
+    "nome": "Colera",
+    "insumos": {
+      "soro_oral_reidratacao": {"unidade": "sache", "consumo_medio_por_caso": 20},
+      "solucao_ringer_lactato_500ml": {"unidade": "frasco", "consumo_medio_por_caso": 4},
+      "doxiciclina_100mg": {"unidade": "comprimido", "consumo_medio_por_caso": 6}
+    }
+  },
+  "A01": {
+    "nome": "Febre tifoide",
+    "insumos": {
+      "ciprofloxacino_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 14},
+      "soro_oral_reidratacao": {"unidade": "sache", "consumo_medio_por_caso": 10}
+    }
+  },
+  "A09": {
+    "nome": "Diarreia e gastroenterite infecciosa",
+    "insumos": {
+      "soro_oral_reidratacao": {"unidade": "sache", "consumo_medio_por_caso": 10},
+      "zinco_sulfato_20mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10}
+    }
+  },
+  "A90": {
+    "nome": "Dengue classica",
+    "insumos": {
+      "dipirona_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 20},
+      "soro_oral_reidratacao": {"unidade": "sache", "consumo_medio_por_caso": 10},
+      "paracetamol_750mg": {"unidade": "comprimido", "consumo_medio_por_caso": 14}
+    }
+  },
+  "A91": {
+    "nome": "Dengue hemorragica",
+    "insumos": {
+      "solucao_ringer_lactato_500ml": {"unidade": "frasco", "consumo_medio_por_caso": 8},
+      "soro_fisiologico_500ml": {"unidade": "frasco", "consumo_medio_por_caso": 6},
+      "dipirona_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 20},
+      "concentrado_plaquetario": {"unidade": "unidade", "consumo_medio_por_caso": 2}
+    }
+  },
+  "A92": {
+    "nome": "Chikungunya / Zika / outras arboviroses",
+    "insumos": {
+      "dipirona_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 20},
+      "cloroquina_150mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10},
+      "soro_oral_reidratacao": {"unidade": "sache", "consumo_medio_por_caso": 8}
+    }
+  },
+  "B50": {
+    "nome": "Malaria por Plasmodium falciparum",
+    "insumos": {
+      "artemeter_lumefantrina": {"unidade": "comprimido", "consumo_medio_por_caso": 24},
+      "primaquina_15mg": {"unidade": "comprimido", "consumo_medio_por_caso": 3}
+    }
+  },
+  "B54": {
+    "nome": "Malaria nao especificada",
+    "insumos": {
+      "cloroquina_150mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10},
+      "primaquina_15mg": {"unidade": "comprimido", "consumo_medio_por_caso": 14}
+    }
+  },
+  "J09": {
+    "nome": "Influenza por virus identificado",
+    "insumos": {
+      "oseltamivir_75mg": {"unidade": "capsula", "consumo_medio_por_caso": 10},
+      "paracetamol_750mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10}
+    }
+  },
+  "J18": {
+    "nome": "Pneumonia nao especificada",
+    "insumos": {
+      "amoxicilina_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 21},
+      "azitromicina_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 5},
+      "oxigenio_cilindro": {"unidade": "cilindro", "consumo_medio_por_caso": 1}
+    }
+  },
+  "U07": {
+    "nome": "COVID-19",
+    "insumos": {
+      "dexametasona_4mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10},
+      "oxigenio_cilindro": {"unidade": "cilindro", "consumo_medio_por_caso": 2},
+      "heparina_5000ui": {"unidade": "frasco", "consumo_medio_por_caso": 3}
+    }
+  },
+  "A15": {
+    "nome": "Tuberculose respiratoria confirmada",
+    "insumos": {
+      "rifampicina_150mg": {"unidade": "comprimido", "consumo_medio_por_caso": 180},
+      "isoniazida_100mg": {"unidade": "comprimido", "consumo_medio_por_caso": 180},
+      "pirazinamida_500mg": {"unidade": "comprimido", "consumo_medio_por_caso": 120},
+      "etambutol_400mg": {"unidade": "comprimido", "consumo_medio_por_caso": 120}
+    }
+  },
+  "I21": {
+    "nome": "Infarto agudo do miocardio",
+    "insumos": {
+      "acido_acetilsalicilico_100mg": {"unidade": "comprimido", "consumo_medio_por_caso": 30},
+      "clopidogrel_75mg": {"unidade": "comprimido", "consumo_medio_por_caso": 30},
+      "heparina_5000ui": {"unidade": "frasco", "consumo_medio_por_caso": 5},
+      "alteplase_50mg": {"unidade": "frasco", "consumo_medio_por_caso": 1}
+    }
+  },
+  "O14": {
+    "nome": "Pre-eclampsia",
+    "insumos": {
+      "sulfato_magnesio_500mg": {"unidade": "ampola", "consumo_medio_por_caso": 6},
+      "hidralazina_20mg": {"unidade": "ampola", "consumo_medio_por_caso": 4},
+      "nifedipina_10mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10}
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "veiculacao_hidrica": {
+    "label": "Doencas de Veiculacao Hidrica",
+    "color": "#1f77b4",
+    "descricao": "Doencas transmitidas por agua ou alimentos contaminados. Fortemente correlacionadas com deficit de saneamento basico.",
+    "prefixes": ["A00", "A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A15", "A16", "A17", "A18", "A19", "B50", "B51", "B52", "B53", "B54"],
+    "cids_principais": ["A00", "A01", "A02", "A04", "A06", "A09", "A15"]
+  },
+  "vetorial": {
+    "label": "Doencas de Transmissao Vetorial",
+    "color": "#ff7f0e",
+    "descricao": "Doencas transmitidas por vetores (mosquitos, carrapatos). Dengue, zika, chikungunya, malaria, febre amarela.",
+    "prefixes": ["A90", "A91", "A92", "A93", "A94", "A95", "A96", "A97", "A98", "A99", "B50", "B51", "B52", "B53", "B54", "B55", "B56", "B57"],
+    "cids_principais": ["A90", "A92", "A95", "B50", "B54"]
+  },
+  "respiratorio": {
+    "label": "Doencas Respiratorias",
+    "color": "#2ca02c",
+    "descricao": "Doencas do aparelho respiratorio de origem infecciosa ou ambiental. Influenza, pneumonia, COVID-19, DPOC.",
+    "prefixes": ["J09", "J10", "J11", "J12", "J13", "J14", "J15", "J16", "J17", "J18", "J20", "J21", "J22", "J40", "J41", "J42", "J43", "J44", "J45", "U07", "U08", "U09", "U10"],
+    "cids_principais": ["J09", "J10", "J18", "J44", "J45", "U07"]
+  },
+  "cardiovascular_metabolico": {
+    "label": "Doencas Cardiovasculares e Metabolicas",
+    "color": "#d62728",
+    "descricao": "Doencas cronicas do aparelho circulatorio e metabolismo. Associadas a IDH, urbanizacao e estilo de vida.",
+    "prefixes": ["I10", "I11", "I12", "I13", "I14", "I15", "I20", "I21", "I22", "I25", "I50", "I60", "I61", "I63", "I64", "E10", "E11", "E12", "E13", "E14"],
+    "cids_principais": ["I10", "I21", "I25", "I50", "I63", "E11"]
+  },
+  "violencia_trauma": {
+    "label": "Violencia e Causas Externas",
+    "color": "#9467bd",
+    "descricao": "Lesoes, envenenamentos e causas externas de morbidade. Acidentes de transito, agressoes, automutilacao.",
+    "prefixes": ["V01", "V10", "V20", "V30", "V40", "V50", "V60", "V70", "V80", "V90", "W00", "W10", "W20", "X60", "X61", "X62", "X63", "X64", "X70", "X80", "X85", "X86", "X87", "X88", "X89", "X90", "X91", "X92", "X93", "X94", "X95", "X96", "X97", "X98", "X99", "Y00"],
+    "cids_principais": ["V01", "V40", "X60", "X85", "X99"]
+  },
+  "materno_infantil": {
+    "label": "Saude Materno-Infantil",
+    "color": "#8c564b",
+    "descricao": "Complicacoes de gravidez, parto, puerperio e afeccoes perinatais. Indicador de qualidade da atencao basica.",
+    "prefixes": ["O10", "O11", "O12", "O13", "O14", "O15", "O16", "O20", "O21", "O22", "O60", "O61", "O62", "O63", "O80", "O81", "O82", "P00", "P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08", "P10", "P20", "P21", "P22"],
+    "cids_principais": ["O14", "O15", "O80", "P07", "P22"]
+  }
+}
