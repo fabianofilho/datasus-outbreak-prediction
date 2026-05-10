@@ -1,16 +1,10 @@
-"""Cliente para a API publica do InfoDengue.
+"""Cliente unificado de doencas epidemiologicas.
 
-Documentacao da API: https://info.dengue.mat.br/services/api
-Endpoint: /api/alertcity
+Fontes:
+  Arboviroses            -> InfoDengue REST API (dados reais)
+  Gastrointestinais/SRAG -> SINAN/SIVEP sintetico com sazonalidade brasileira
 
-Parametros principais:
-  geocode   : codigo IBGE do municipio (7 digitos)
-  disease   : dengue | chikungunya | zika
-  format    : json
-  ew_start  : semana epidemiologica de inicio (1-52)
-  ew_end    : semana epidemiologica de fim
-  ey_start  : ano de inicio
-  ey_end    : ano de fim
+Documentacao InfoDengue: https://info.dengue.mat.br/services/api
 """
 
 from __future__ import annotations
@@ -29,7 +23,39 @@ except (PermissionError, OSError):
     _CACHE_DIR = Path("/tmp/epidemio_cache")
     _CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-DISEASES = ["dengue", "chikungunya", "zika"]
+_ARBOVIRUS = {"dengue", "chikungunya", "zika"}
+
+DISEASE_GROUPS: dict[str, list[str]] = {
+    "Arboviroses": ["dengue", "chikungunya", "zika"],
+    "Gastrointestinais": ["diarreia_aguda", "hepatite_a", "leptospirose", "febre_tifoide"],
+    "Respiratórias": ["influenza_a", "srag"],
+}
+
+DISEASES: list[str] = [d for group in DISEASE_GROUPS.values() for d in group]
+
+DISEASE_CID: dict[str, str] = {
+    "dengue": "A90",
+    "chikungunya": "A92",
+    "zika": "A92",
+    "diarreia_aguda": "A09",
+    "hepatite_a": "B15",
+    "leptospirose": "A27",
+    "febre_tifoide": "A01",
+    "influenza_a": "J09",
+    "srag": "J11",
+}
+
+DISEASE_LABELS: dict[str, str] = {
+    "dengue": "Dengue",
+    "chikungunya": "Chikungunya",
+    "zika": "Zika",
+    "diarreia_aguda": "Diarreia Aguda",
+    "hepatite_a": "Hepatite A",
+    "leptospirose": "Leptospirose",
+    "febre_tifoide": "Febre Tifóide",
+    "influenza_a": "Influenza A",
+    "srag": "SRAG",
+}
 
 
 def _cache_path(geocode: str, disease: str, ey_start: int, ey_end: int) -> Path:
@@ -43,12 +69,29 @@ def fetch_city(
     ey_end: int = 2024,
     use_cache: bool = True,
 ) -> pd.DataFrame:
-    """Busca dados de alerta de arbovirose para um municipio.
+    """Busca dados de alerta para um municipio.
 
-    Retorna DataFrame com colunas:
-      data_iniSE, SE, casos_est, casos, municipio_geocodigo, nivel, Rt, pop
+    Roteia automaticamente:
+      - Arboviroses  -> InfoDengue API (dados reais)
+      - Demais       -> gerador sintetico SINAN/SIVEP com sazonalidade brasileira
     """
     geocode = str(geocode)
+
+    if disease in _ARBOVIRUS:
+        return _fetch_infodengue(geocode, disease, ey_start, ey_end, use_cache)
+
+    from core.data.sinan import generate
+    df = generate(geocode, disease, ey_start, ey_end)
+    return df
+
+
+def _fetch_infodengue(
+    geocode: str,
+    disease: str,
+    ey_start: int,
+    ey_end: int,
+    use_cache: bool,
+) -> pd.DataFrame:
     cache = _cache_path(geocode, disease, ey_start, ey_end)
 
     if use_cache and cache.exists():
@@ -64,10 +107,13 @@ def fetch_city(
         "ey_end": ey_end,
     }
 
-    resp = requests.get(_BASE_URL, params=params, timeout=30)
-    resp.raise_for_status()
+    try:
+        resp = requests.get(_BASE_URL, params=params, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception:
+        return pd.DataFrame()
 
-    data = resp.json()
     if not data:
         return pd.DataFrame()
 
@@ -75,7 +121,10 @@ def fetch_city(
     df = _clean(df, geocode)
 
     if len(df) >= 52:
-        df.to_parquet(cache, index=False)
+        try:
+            df.to_parquet(cache, index=False)
+        except Exception:
+            pass
 
     return df
 
@@ -120,10 +169,7 @@ def fetch_state(
 
 
 def series_for_forecast(df: pd.DataFrame, col: str = "casos_est") -> pd.Series:
-    """Extrai serie temporal indexada por data para uso no skforecast.
-
-    Filtra municipios com menos de 52 semanas de historico.
-    """
+    """Extrai serie temporal indexada por data para uso no skforecast."""
     if df.empty or "data_iniSE" not in df.columns or col not in df.columns:
         return pd.Series(dtype=float)
 

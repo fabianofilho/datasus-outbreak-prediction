@@ -7,7 +7,7 @@ Dados: InfoDengue por municipio e semana epidemiologica.
 import streamlit as st
 import pandas as pd
 
-from core.data.infodengue import fetch_city, fetch_state, DISEASES
+from core.data.infodengue import fetch_city, fetch_state, DISEASES, DISEASE_GROUPS, DISEASE_LABELS
 from core.surtos.detector import classify_alert, summary_table, alert_color, VERMELHO, AMARELO
 from core.surtos.forecaster import forecast_with_history
 from core.viz.timeseries import plot_series_with_forecast, plot_alert_table_bar
@@ -33,7 +33,15 @@ DEMO_CITIES = {
 with st.sidebar:
     sidebar_back()
     st.header("Filtros")
-    doenca = st.selectbox("Doença", DISEASES, index=0)
+    doenca = st.selectbox(
+        "Doença",
+        options=list(DISEASE_LABELS.keys()),
+        format_func=lambda d: DISEASE_LABELS[d],
+        index=0,
+    )
+    _sintetico = doenca not in {"dengue", "chikungunya", "zika"}
+    if _sintetico:
+        st.caption("Dados simulados com sazonalidade epidemiológica. SINAN sem API pública.")
     ano_inicio = st.slider("Ano de início", 2019, 2024, 2020)
     ano_fim = st.slider("Ano de fim", 2020, 2024, 2024)
     cidades_sel = st.multiselect(

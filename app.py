@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
+from core.data.infodengue import fetch_city, series_for_forecast, DISEASES, DISEASE_GROUPS, DISEASE_LABELS
 from core.surtos.detector import classify_alert, summary_table, VERDE, AMARELO, VERMELHO, alert_color
 from core.viz.theme import inject, footer, badge, module_card
 
@@ -110,11 +110,29 @@ for col, m in zip([c1, c2], MODULOS[3:]):
 st.divider()
 
 # --- KPIs ao vivo ---
+_doenca_home_opts = list(DISEASE_LABELS.keys())
+_doenca_home_labels = list(DISEASE_LABELS.values())
+_doenca_home_idx = st.selectbox(
+    "Doença para painel de alertas",
+    options=_doenca_home_opts,
+    format_func=lambda d: DISEASE_LABELS[d],
+    index=0,
+    key="home_doenca",
+)
+_eh_sintetico = _doenca_home_idx not in {"dengue", "chikungunya", "zika"}
+
+_label_doenca = DISEASE_LABELS[_doenca_home_idx]
 st.markdown(
-    "<p style='font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;"
-    "letter-spacing:0.1em;margin-bottom:0.75rem'>Alertas ao vivo · capitais selecionadas · dengue</p>",
+    f"<p style='font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;"
+    f"letter-spacing:0.1em;margin-bottom:0.75rem'>Alertas ao vivo · capitais selecionadas · {_label_doenca}"
+    + (" · dados simulados" if _eh_sintetico else "") + "</p>",
     unsafe_allow_html=True,
 )
+if _eh_sintetico:
+    st.info(
+        f"**{_label_doenca}:** dados simulados com sazonalidade epidemiológica brasileira. "
+        "SINAN/SIVEP-Gripe não têm API pública em tempo real; os valores são estimativas para demonstração."
+    )
 
 DEMO_CITIES = {
     "Rio de Janeiro": "3304557",
@@ -136,10 +154,10 @@ def load_summary(geocode: str, nome: str, doenca: str, y0: int, y1: int) -> pd.D
     alert_df = classify_alert(series)
     return summary_table(alert_df, municipio=nome, doenca=doenca)
 
-with st.spinner("Carregando dados do InfoDengue..."):
+with st.spinner(f"Carregando dados: {_label_doenca}..."):
     summaries = []
     for nome, gc in DEMO_CITIES.items():
-        s = load_summary(gc, nome, "dengue", 2021, 2024)
+        s = load_summary(gc, nome, _doenca_home_idx, 2021, 2024)
         if not s.empty:
             summaries.append(s)
 

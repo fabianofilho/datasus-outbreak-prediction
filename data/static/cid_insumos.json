@@ -85,6 +85,30 @@
       "heparina_5000ui": {"unidade": "frasco", "consumo_medio_por_caso": 3}
     }
   },
+  "A27": {
+    "nome": "Leptospirose",
+    "insumos": {
+      "penicilina_g_cristalina_5mi": {"unidade": "frasco", "consumo_medio_por_caso": 14},
+      "doxiciclina_100mg": {"unidade": "comprimido", "consumo_medio_por_caso": 14},
+      "soro_fisiologico_500ml": {"unidade": "frasco", "consumo_medio_por_caso": 4}
+    }
+  },
+  "B15": {
+    "nome": "Hepatite A aguda",
+    "insumos": {
+      "soro_oral_reidratacao": {"unidade": "sache", "consumo_medio_por_caso": 10},
+      "paracetamol_750mg": {"unidade": "comprimido", "consumo_medio_por_caso": 20},
+      "vitamina_k_10mg": {"unidade": "ampola", "consumo_medio_por_caso": 2}
+    }
+  },
+  "J11": {
+    "nome": "Influenza / SRAG nao especificada",
+    "insumos": {
+      "oseltamivir_75mg": {"unidade": "capsula", "consumo_medio_por_caso": 10},
+      "paracetamol_750mg": {"unidade": "comprimido", "consumo_medio_por_caso": 10},
+      "oxigenio_cilindro": {"unidade": "cilindro", "consumo_medio_por_caso": 1}
+    }
+  },
   "A15": {
     "nome": "Tuberculose respiratoria confirmada",
     "insumos": {

@@ -8,7 +8,7 @@ AVISO: Projeta DEMANDA estimada. Nao ha dados de estoque do SUS em tempo real.
 import streamlit as st
 import pandas as pd
 
-from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
+from core.data.infodengue import fetch_city, series_for_forecast, DISEASES, DISEASE_LABELS, DISEASE_CID
 from core.surtos.forecaster import forecast
 from core.insumos.mapping import all_insumos, cids_with_mapping
 from core.insumos.demand import project_demand, project_by_municipio
@@ -26,23 +26,28 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-DEMO_CITIES = {
-    "Rio de Janeiro (RJ)": ("3304557", "A90"),
-    "Sao Paulo (SP)": ("3550308", "A90"),
-    "Belo Horizonte (MG)": ("3106200", "A90"),
-    "Fortaleza (CE)": ("2304400", "A90"),
-    "Manaus (AM)": ("1302603", "A90"),
+DEMO_CITIES_GEO = {
+    "Rio de Janeiro (RJ)": "3304557",
+    "Sao Paulo (SP)": "3550308",
+    "Belo Horizonte (MG)": "3106200",
+    "Fortaleza (CE)": "2304400",
+    "Manaus (AM)": "1302603",
 }
 
 with st.sidebar:
     sidebar_back()
     st.header("Configuração")
-    doenca = st.selectbox("Doença", DISEASES, index=0)
+    doenca = st.selectbox(
+        "Doença",
+        options=list(DISEASE_LABELS.keys()),
+        format_func=lambda d: DISEASE_LABELS[d],
+        index=0,
+    )
     horizon = st.slider("Horizonte de planejamento (semanas)", 1, 12, 4)
     cidades_sel = st.multiselect(
         "Municípios",
-        list(DEMO_CITIES.keys()),
-        default=list(DEMO_CITIES.keys())[:3],
+        list(DEMO_CITIES_GEO.keys()),
+        default=list(DEMO_CITIES_GEO.keys())[:3],
     )
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -63,16 +68,17 @@ if not cidades_sel:
     st.stop()
 
 with st.spinner("Calculando previsões e demanda..."):
+    cid = DISEASE_CID.get(doenca, "A90")
     rows = []
     for nome in cidades_sel:
-        geocode, cid = DEMO_CITIES[nome]
+        geocode = DEMO_CITIES_GEO[nome]
         result = get_forecast(geocode, cid, doenca, horizon)
         rows.append({"municipio": nome, "cid": cid, "casos_semana": result["casos_semana"]})
 
     forecast_df = pd.DataFrame(rows)
 
     if forecast_df.empty or forecast_df["casos_semana"].sum() == 0:
-        st.warning("Sem previsoes disponiveis. Verifique os dados.")
+        st.warning("Sem previsões disponíveis. Verifique os dados.")
         st.stop()
 
     demand_df = project_by_municipio(

@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
+from core.data.infodengue import fetch_city, series_for_forecast, DISEASES, DISEASE_LABELS
 from core.surtos.detector import classify_alert, summary_table, VERDE, AMARELO, VERMELHO
 from core.viz.theme import inject, footer, badge, sidebar_back
 
@@ -55,7 +55,15 @@ NIVEL_RANK = {VERMELHO: 3, AMARELO: 2, VERDE: 1}
 with st.sidebar:
     sidebar_back()
     st.header("Filtros")
-    doenca = st.selectbox("Doença", DISEASES, index=0)
+    doenca = st.selectbox(
+        "Doença",
+        options=list(DISEASE_LABELS.keys()),
+        format_func=lambda d: DISEASE_LABELS[d],
+        index=0,
+    )
+    _sintetico = doenca not in {"dengue", "chikungunya", "zika"}
+    if _sintetico:
+        st.caption("Dados simulados com sazonalidade epidemiológica real.")
     ano_inicio = st.slider("Ano inicio", 2019, 2024, 2021)
     ano_fim = st.slider("Ano fim", 2020, 2024, 2024)
     st.divider()
