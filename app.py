@@ -29,6 +29,7 @@ with st.sidebar:
     st.page_link("pages/02_macrocid.py", label="Grafo MacroCID")
     st.page_link("pages/03_insumos.py", label="Planejamento de Insumos")
     st.page_link("pages/04_mapa_urbano.py", label="Mapa Urbano")
+    st.page_link("pages/05_mapa_surtos.py", label="Mapa de Surtos")
 
 # --- Hero ---
 badge("Plataforma de Vigilancia Epidemiologica · Dados Publicos SUS")
