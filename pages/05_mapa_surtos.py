@@ -16,6 +16,7 @@ st.set_page_config(
     page_title="Mapa de Surtos · datasus-outbreak-prediction",
     page_icon="🦠",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 inject(subtitle="Mapa de Surtos")
 badge("Distribuição Geográfica · InfoDengue · Capitais e Grandes Municípios")

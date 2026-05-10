@@ -232,11 +232,15 @@ div[data-testid="metric-container"] [data-testid="stMetricValue"] {
   margin: 0.25rem 0;
 }
 
-/* --- Sidebar --- */
+/* --- Sidebar fixa (sem botao de colapsar) --- */
 [data-testid="stSidebar"] {
   background-color: #ffffff !important;
   border-right: 1px solid var(--slate-200) !important;
 }
+[data-testid="collapsedControl"]          { display: none !important; }
+[data-testid="stSidebarCollapsedControl"] { display: none !important; }
+button[data-testid="baseButton-headerNoPadding"] { display: none !important; }
+section[data-testid="stSidebar"] > div > div > div > button { display: none !important; }
 [data-testid="stSidebar"] .block-container {
   padding-top: 1.5rem !important;
   max-width: 100% !important;

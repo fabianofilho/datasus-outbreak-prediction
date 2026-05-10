@@ -14,7 +14,7 @@ from core.macrocid.cooccurrence import build_cooccurrence, normalized_cooccurren
 from core.viz.plotly_graph import force_directed_plot, heatmap_plot
 from core.viz.theme import inject, footer, badge, sidebar_back
 
-st.set_page_config(page_title="MacroCID · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
+st.set_page_config(page_title="MacroCID · datasus-outbreak-prediction", page_icon="🦠", layout="wide", initial_sidebar_state="expanded")
 inject(subtitle="Grafo MacroCID")
 badge("Rede de Co-ocorrência CID-10 · SIM/DATASUS")
 

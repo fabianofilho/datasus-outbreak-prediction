@@ -13,7 +13,7 @@ from core.surtos.forecaster import forecast_with_history
 from core.viz.timeseries import plot_series_with_forecast, plot_alert_table_bar
 from core.viz.theme import inject, footer, badge, sidebar_back
 
-st.set_page_config(page_title="Surtos · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
+st.set_page_config(page_title="Surtos · datasus-outbreak-prediction", page_icon="🦠", layout="wide", initial_sidebar_state="expanded")
 inject(subtitle="Vigilância de Surtos")
 badge("Detecção de Anomalias · Previsão 4 Semanas · InfoDengue")
 

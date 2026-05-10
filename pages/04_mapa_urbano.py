@@ -21,7 +21,7 @@ from core.geo.saneamento import (
 )
 from core.viz.theme import inject, footer, badge, sidebar_back
 
-st.set_page_config(page_title="Mapa Urbano · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
+st.set_page_config(page_title="Mapa Urbano · datasus-outbreak-prediction", page_icon="🦠", layout="wide", initial_sidebar_state="expanded")
 inject(subtitle="Mapa Urbano")
 badge("Saneamento x Doenças · SNIS · IBGE")
 st.caption(

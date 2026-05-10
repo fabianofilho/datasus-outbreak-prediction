@@ -80,9 +80,16 @@ def _name_variants(name: str) -> list[str]:
 # -- DBC -> DataFrame -------------------------------------------------------
 
 def _dbc_to_df(dbc_bytes: bytes) -> pd.DataFrame:
-    """Decompress DBC bytes -> DataFrame via datasus-dbc + dbfread."""
-    from datasus_dbc import decompress_bytes
-    import dbfread
+    """Decompress DBC bytes -> DataFrame via datasus-dbc + dbfread.
+
+    Retorna DataFrame vazio se os pacotes nao estiverem instalados
+    (ex: Streamlit Cloud sem wheels pre-compilados).
+    """
+    try:
+        from datasus_dbc import decompress_bytes
+        import dbfread
+    except ModuleNotFoundError:
+        return pd.DataFrame()
 
     dbf_bytes = decompress_bytes(dbc_bytes)
     with tempfile.NamedTemporaryFile(suffix=".dbf", delete=False) as f:
