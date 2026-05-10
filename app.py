@@ -1,42 +1,52 @@
-"""epidemio-urbano: Sistema de vigilancia epidemiologica integrada.
-
-Home: KPIs nacionais e mapa resumo de alertas.
-"""
+"""datasus-outbreak-prediction: Sistema de vigilancia epidemiologica integrada."""
 
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
 from core.surtos.detector import classify_alert, summary_table, VERDE, AMARELO, VERMELHO, alert_color
+from core.viz.theme import inject, footer, badge
 
 st.set_page_config(
-    page_title="epidemio-urbano",
+    page_title="datasus-outbreak-prediction",
     page_icon=None,
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# --- Header ---
-st.title("epidemio-urbano")
-st.caption(
-    "Sistema de vigilancia epidemiologica integrada. "
-    "Detecta surtos, preve demanda por insumos e correlaciona doencas com saneamento urbano."
-)
+inject(subtitle="Outbreak Prediction")
 
 # --- Sidebar ---
 with st.sidebar:
-    st.header("Configuracao global")
+    st.markdown("### Filtros")
     doenca = st.selectbox("Doenca", DISEASES, index=0)
     ano_inicio = st.slider("Ano de inicio", 2019, 2024, 2021)
     ano_fim = st.slider("Ano de fim", 2020, 2024, 2024)
     st.divider()
-    st.markdown("**Navegacao**")
+    st.markdown("### Modulos")
     st.page_link("pages/01_surtos.py", label="Vigilancia de Surtos")
     st.page_link("pages/02_macrocid.py", label="Grafo MacroCID")
     st.page_link("pages/03_insumos.py", label="Planejamento de Insumos")
     st.page_link("pages/04_mapa_urbano.py", label="Mapa Urbano")
 
-# --- Demo: capitais selecionadas ---
+# --- Hero ---
+badge("Plataforma de Vigilancia Epidemiologica · Dados Publicos SUS")
+st.markdown(
+    "<h2 style='font-size:2rem;font-weight:700;color:#0f172a;line-height:1.2;margin:0 0 0.5rem 0'>"
+    "Preveja surtos antes<br>que virem <span style='color:#009c3b;font-style:italic;"
+    "font-family:Playfair Display,Georgia,serif'>crise</span>."
+    "</h2>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "<p style='color:#64748b;font-size:1rem;margin:0 0 1.5rem 0'>"
+    "Deteccao de anomalias · Previsao LightGBM · Grafo MacroCID · Saneamento x doencas"
+    "</p>",
+    unsafe_allow_html=True,
+)
+
+# --- Demo: capitais ---
 DEMO_CITIES = {
     "Rio de Janeiro": "3304557",
     "Sao Paulo": "3550308",
@@ -57,7 +67,7 @@ def load_summary(geocode: str, nome: str, doenca: str, y0: int, y1: int) -> pd.D
     alert_df = classify_alert(series)
     return summary_table(alert_df, municipio=nome, doenca=doenca)
 
-with st.spinner("Carregando dados de vigilancia..."):
+with st.spinner("Carregando dados do InfoDengue..."):
     summaries = []
     for nome, gc in DEMO_CITIES.items():
         s = load_summary(gc, nome, doenca, ano_inicio, ano_fim)
@@ -67,82 +77,80 @@ with st.spinner("Carregando dados de vigilancia..."):
 summary_df = pd.concat(summaries, ignore_index=True) if summaries else pd.DataFrame()
 
 # --- KPIs ---
-st.subheader("Visao geral do monitoramento")
 c1, c2, c3, c4 = st.columns(4)
 with c1:
     n_vermelho = int((summary_df["nivel_alerta"] == VERMELHO).sum()) if not summary_df.empty else 0
-    st.metric("Municipios: alerta vermelho", n_vermelho)
+    st.metric("Alerta vermelho", n_vermelho)
 with c2:
     n_amarelo = int((summary_df["nivel_alerta"] == AMARELO).sum()) if not summary_df.empty else 0
-    st.metric("Municipios: alerta amarelo", n_amarelo)
+    st.metric("Alerta amarelo", n_amarelo)
 with c3:
     n_verde = int((summary_df["nivel_alerta"] == VERDE).sum()) if not summary_df.empty else 0
-    st.metric("Municipios: dentro do esperado", n_verde)
+    st.metric("Dentro do esperado", n_verde)
 with c4:
     total_casos = int(summary_df["casos"].sum()) if not summary_df.empty and "casos" in summary_df.columns else 0
-    st.metric("Casos na ultima semana", f"{total_casos:,}")
+    st.metric("Casos ultima semana", f"{total_casos:,}")
 
 st.divider()
 
-# --- Tabela de resumo ---
-st.subheader(f"Resumo de alertas: {doenca} ({ano_inicio}-{ano_fim})")
-st.caption(f"Capitais monitoradas: {', '.join(DEMO_CITIES.keys())}")
+# --- Tabela de alertas ---
+st.markdown(
+    f"<div style='font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;"
+    f"letter-spacing:0.08em;margin-bottom:0.75rem'>"
+    f"Resumo de alertas &mdash; {doenca} &middot; {ano_inicio}&ndash;{ano_fim}"
+    f"</div>",
+    unsafe_allow_html=True,
+)
 
 if not summary_df.empty:
-    cols = [c for c in ["municipio", "ultima_semana", "casos", "casos_esperados", "z_score", "nivel_alerta"] if c in summary_df.columns]
-    summary_display = summary_df[cols].copy()
-    summary_display["nivel_alerta"] = summary_display["nivel_alerta"].str.upper()
+    cols = [c for c in ["municipio", "ultima_semana", "casos", "casos_esperados", "z_score", "nivel_alerta"]
+            if c in summary_df.columns]
+    display = summary_df[cols].copy()
+    display["nivel_alerta"] = display["nivel_alerta"].str.upper()
 
     def _highlight(row):
         nivel = row.get("nivel_alerta", "VERDE").lower()
         c = alert_color(nivel)
-        return [f"background-color: {c}30"] * len(row)
+        return [f"background-color: {c}22"] * len(row)
 
-    st.dataframe(
-        summary_display.style.apply(_highlight, axis=1),
-        use_container_width=True,
-        hide_index=True,
-    )
+    st.dataframe(display.style.apply(_highlight, axis=1), use_container_width=True, hide_index=True)
 
-    # Grafico de barras por cidade
-    import plotly.express as px
     fig = px.bar(
         summary_df.sort_values("z_score", ascending=False),
-        x="municipio",
-        y="z_score",
+        x="municipio", y="z_score",
         color="nivel_alerta",
         color_discrete_map={VERDE: "#2ecc71", AMARELO: "#f39c12", VERMELHO: "#e74c3c"},
-        title="Z-score por municipio (desvio da media historica)",
-        labels={"z_score": "Z-score", "municipio": "Municipio", "nivel_alerta": "Alerta"},
+        labels={"z_score": "Z-score", "municipio": "", "nivel_alerta": "Alerta"},
     )
-    fig.add_hline(y=1.5, line_dash="dash", line_color="#f39c12", annotation_text="Limiar amarelo")
-    fig.add_hline(y=3.0, line_dash="dash", line_color="#e74c3c", annotation_text="Limiar vermelho")
-    fig.update_layout(height=400, plot_bgcolor="#fafafa")
+    fig.add_hline(y=1.5, line_dash="dash", line_color="#f39c12", annotation_text="Amarelo")
+    fig.add_hline(y=3.0, line_dash="dash", line_color="#e74c3c", annotation_text="Vermelho")
+    fig.update_layout(
+        height=360,
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font=dict(family="Inter, system-ui, sans-serif", size=12, color="#1e293b"),
+        margin=dict(l=10, r=10, t=20, b=40),
+        legend=dict(orientation="h", y=-0.2),
+    )
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=True, gridcolor="#f1f5f9")
     st.plotly_chart(fig, use_container_width=True)
 else:
-    st.info("Nenhum dado de alerta disponivel. Verifique a conexao com o InfoDengue.")
+    st.info("Nenhum dado disponivel. Verifique a conexao com o InfoDengue.")
 
 st.divider()
 
-# --- Sobre o sistema ---
-with st.expander("Sobre este sistema"):
+with st.expander("Sobre o sistema"):
     st.markdown("""
-**epidemio-urbano** e um sistema de vigilancia epidemiologica integrada com dados publicos do SUS.
+**datasus-outbreak-prediction** conecta dados epidemiologicos e infraestrutura urbana para
+antecipar surtos e apoiar planejamento em saude publica.
 
-**Fontes de dados:**
-- SIM/DATASUS: mortalidade por CID-10 e municipio
-- InfoDengue: casos semanais de dengue, chikungunya e zika
-- SNIS: cobertura de saneamento basico por municipio
-- IBGE: dados demograficos e shapefile de municipios
+**Fontes:** InfoDengue · SIM/DATASUS · SNIS · IBGE
 
-**Modulos:**
-- Vigilancia de surtos: z-score rolling + CUSUM + previsao LightGBM (4 semanas)
-- Grafo MacroCID: rede de co-ocorrencia entre grupos de CIDs
-- Planejamento de insumos: projecao de demanda por medicamentos
-- Mapa urbano: correlacao saneamento x incidencia de doencas hidricas
+**Modulos:** Vigilancia de surtos · Grafo MacroCID · Planejamento de insumos · Mapa urbano
 
-**Limitacoes:**
-- O modulo de insumos projeta demanda estimada, nao estoque atual.
-- Dados SNIS tem atraso de 1-2 anos.
-- Demo limitado a capitais brasileiras. Para analise completa, use scripts/download_all.py.
+**Limitacoes:** Modulo de insumos projeta demanda estimada (sem dados de estoque real).
+Dados SNIS com atraso de 1-2 anos. Demo restrito a capitais.
     """)
+
+footer("V1.0")

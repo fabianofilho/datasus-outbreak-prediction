@@ -12,12 +12,18 @@ from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
 from core.surtos.forecaster import forecast
 from core.insumos.mapping import all_insumos, cids_with_mapping
 from core.insumos.demand import project_demand, project_by_municipio
+from core.viz.theme import inject, footer, badge
 
-st.set_page_config(page_title="Planejamento de Insumos", layout="wide")
-st.title("Planejamento de Insumos")
-st.info(
-    "Este modulo projeta demanda estimada de insumos com base em previsoes epidemiologicas. "
+st.set_page_config(page_title="Insumos · datasus-outbreak-prediction", layout="wide")
+inject(subtitle="Planejamento de Insumos")
+badge("Projecao de Demanda · PCDT/MS · Estimativa")
+st.markdown(
+    "<div style='background:#f0f7ff;border-left:4px solid #0047bb;border-radius:0 8px 8px 0;"
+    "padding:0.75rem 1rem;font-size:0.875rem;color:#1e293b;margin-bottom:1rem'>"
+    "Demanda estimada com base em previsoes epidemiologicas. "
     "Nao ha dados de estoque em tempo real no SUS publico."
+    "</div>",
+    unsafe_allow_html=True,
 )
 
 DEMO_CITIES = {
@@ -118,5 +124,16 @@ if not demand_df.empty:
         title=f"Demanda projetada - {municipio_vis} ({horizon} semanas)",
         labels={"demanda_total": "Unidades", "insumo": "Insumo"},
     )
-    fig.update_layout(height=400, plot_bgcolor="#fafafa", yaxis=dict(autorange="reversed"))
+    fig.update_layout(
+        height=400,
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font=dict(family="Inter, system-ui, sans-serif", size=12, color="#1e293b"),
+        yaxis=dict(autorange="reversed"),
+        margin=dict(l=10, r=10, t=40, b=20),
+    )
+    fig.update_xaxes(showgrid=True, gridcolor="#f1f5f9")
+    fig.update_yaxes(showgrid=False)
     st.plotly_chart(fig, use_container_width=True)
+
+footer("Insumos")

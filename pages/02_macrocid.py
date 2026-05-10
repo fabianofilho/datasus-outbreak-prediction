@@ -12,10 +12,11 @@ from core.macrocid.groups import all_group_names, label_of, color_of, add_macroc
 from core.macrocid.builder import build_graph, prune_graph, graph_summary
 from core.macrocid.cooccurrence import build_cooccurrence, normalized_cooccurrence
 from core.viz.plotly_graph import force_directed_plot, heatmap_plot
+from core.viz.theme import inject, footer, badge
 
-st.set_page_config(page_title="Grafo MacroCID", layout="wide")
-st.title("Grafo MacroCID")
-st.caption("Rede de co-ocorrencia entre codigos CID-10 a partir de dados de mortalidade (SIM/DATASUS)")
+st.set_page_config(page_title="MacroCID · datasus-outbreak-prediction", layout="wide")
+inject(subtitle="Grafo MacroCID")
+badge("Rede de Co-ocorrencia CID-10 · SIM/DATASUS")
 
 STATES = ["RJ", "SP", "MG", "BA", "CE", "PE", "RS", "PR", "GO", "AM"]
 
@@ -97,3 +98,5 @@ with tab3:
     if stats.get("top_20"):
         top_df = pd.DataFrame(stats["top_20"])
         st.dataframe(top_df, use_container_width=True, hide_index=True)
+
+footer("MacroCID")

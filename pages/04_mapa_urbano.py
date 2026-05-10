@@ -19,9 +19,11 @@ from core.geo.saneamento import (
     scatter_saneamento_doenca,
     high_risk_municipios,
 )
+from core.viz.theme import inject, footer, badge
 
-st.set_page_config(page_title="Mapa Urbano", layout="wide")
-st.title("Mapa Urbano: Saneamento e Doencas")
+st.set_page_config(page_title="Mapa Urbano · datasus-outbreak-prediction", layout="wide")
+inject(subtitle="Mapa Urbano")
+badge("Saneamento x Doencas · SNIS · IBGE")
 st.caption(
     "Correlacao entre cobertura de saneamento basico (SNIS) e incidencia de doencas de veiculacao hidrica. "
     "Dados SNIS com atraso de 1-2 anos - use como indicador estrutural, nao de monitoramento."
@@ -171,5 +173,15 @@ if "cobertura_esgoto_pct" in snis_df.columns:
         line_color="red",
         annotation_text=f"Media: {snis_df['cobertura_esgoto_pct'].mean():.1f}%",
     )
-    fig_hist.update_layout(height=350, plot_bgcolor="#fafafa")
+    fig_hist.update_layout(
+        height=350,
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font=dict(family="Inter, system-ui, sans-serif", size=12, color="#1e293b"),
+        margin=dict(l=10, r=10, t=40, b=20),
+    )
+    fig_hist.update_xaxes(showgrid=False)
+    fig_hist.update_yaxes(showgrid=True, gridcolor="#f1f5f9")
     st.plotly_chart(fig_hist, use_container_width=True)
+
+footer("Mapa Urbano")
