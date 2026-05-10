@@ -24,7 +24,7 @@ st.markdown(
 inject(subtitle="Outbreak Prediction")
 
 # --- Hero ---
-badge("Plataforma de Vigilancia Epidemiologica · Dados Publicos SUS")
+badge("Plataforma de Vigilância Epidemiológica · Dados Públicos SUS")
 st.markdown(
     "<h2 style='font-size:2rem;font-weight:700;color:#0f172a;line-height:1.2;margin:0 0 0.5rem 0'>"
     "Preveja surtos antes<br>que virem <span style='color:#009c3b;font-style:italic;"
@@ -34,7 +34,7 @@ st.markdown(
 )
 st.markdown(
     "<p style='color:#64748b;font-size:1rem;margin:0 0 1.75rem 0'>"
-    "Deteccao de anomalias · Previsao LightGBM · Grafo MacroCID · Saneamento x doencas"
+    "Detecção de anomalias · Previsão LightGBM · Grafo MacroCID · Saneamento x doenças"
     "</p>",
     unsafe_allow_html=True,
 )
@@ -42,15 +42,15 @@ st.markdown(
 # --- Cards de modulos ---
 st.markdown(
     "<p style='font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;"
-    "letter-spacing:0.1em;margin-bottom:0.75rem'>Modulos</p>",
+    "letter-spacing:0.1em;margin-bottom:0.75rem'>Módulos</p>",
     unsafe_allow_html=True,
 )
 
 MODULOS = [
     {
         "icon": "monitoring",
-        "name": "Vigilancia de Surtos",
-        "desc": "Deteccao de anomalias por z-score rolante e previsao de 4 semanas com LightGBM.",
+        "name": "Vigilância de Surtos",
+        "desc": "Detecção de anomalias por z-score rolante e previsão de 4 semanas com LightGBM.",
         "source": "InfoDengue",
         "page": "pages/01_surtos.py",
         "label": "Abrir",
@@ -58,7 +58,7 @@ MODULOS = [
     {
         "icon": "hub",
         "name": "Grafo MacroCID",
-        "desc": "Rede de co-ocorrencia entre grupos de CID-10 a partir do SIM/DATASUS.",
+        "desc": "Rede de co-ocorrência entre grupos de CID-10 a partir do SIM/DATASUS.",
         "source": "SIM/DATASUS",
         "page": "pages/02_macrocid.py",
         "label": "Abrir",
@@ -66,7 +66,7 @@ MODULOS = [
     {
         "icon": "inventory_2",
         "name": "Planejamento de Insumos",
-        "desc": "Projecao de demanda por medicamentos baseada em casos previstos por municipio.",
+        "desc": "Projeção de demanda por medicamentos baseada em casos previstos por município.",
         "source": "PCDT/MS",
         "page": "pages/03_insumos.py",
         "label": "Abrir",
@@ -74,7 +74,7 @@ MODULOS = [
     {
         "icon": "water",
         "name": "Mapa Urbano",
-        "desc": "Correlacao Spearman entre cobertura de saneamento e incidencia de doencas hidricas.",
+        "desc": "Correlação Spearman entre cobertura de saneamento e incidência de doenças hídricas.",
         "source": "SNIS · IBGE",
         "page": "pages/04_mapa_urbano.py",
         "label": "Abrir",
@@ -82,7 +82,7 @@ MODULOS = [
     {
         "icon": "pin_drop",
         "name": "Mapa de Surtos",
-        "desc": "Distribuicao geografica dos alertas nas capitais e grandes municipios do Brasil.",
+        "desc": "Distribuição geográfica dos alertas nas capitais e grandes municípios do Brasil.",
         "source": "InfoDengue",
         "page": "pages/05_mapa_surtos.py",
         "label": "Abrir",
@@ -112,7 +112,7 @@ st.divider()
 # --- KPIs ao vivo ---
 st.markdown(
     "<p style='font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;"
-    "letter-spacing:0.1em;margin-bottom:0.75rem'>Alertas ao vivo · capitais selecionadas · Dengue</p>",
+    "letter-spacing:0.1em;margin-bottom:0.75rem'>Alertas ao vivo · capitais selecionadas · dengue</p>",
     unsafe_allow_html=True,
 )
 
@@ -193,20 +193,20 @@ if not summary_df.empty:
     fig.update_yaxes(showgrid=True, gridcolor="#f1f5f9")
     st.plotly_chart(fig, use_container_width=True)
 else:
-    st.info("Nenhum dado disponivel. Verifique a conexao com o InfoDengue.")
+    st.info("Nenhum dado disponível. Verifique a conexão com o InfoDengue.")
 
 st.divider()
 
 with st.expander("Sobre o sistema"):
     st.markdown("""
-**datasus-outbreak-prediction** conecta dados epidemiologicos e infraestrutura urbana para
-antecipar surtos e apoiar planejamento em saude publica.
+**datasus-outbreak-prediction** conecta dados epidemiológicos e infraestrutura urbana para
+antecipar surtos e apoiar planejamento em saúde pública.
 
 **Fontes:** InfoDengue · SIM/DATASUS · SNIS · IBGE
 
-**Modulos:** Vigilancia de surtos · Grafo MacroCID · Planejamento de insumos · Mapa urbano · Mapa de surtos
+**Módulos:** Vigilância de surtos · Grafo MacroCID · Planejamento de insumos · Mapa urbano · Mapa de surtos
 
-**Limitacoes:** Modulo de insumos projeta demanda estimada (sem dados de estoque real).
+**Limitações:** Módulo de insumos projeta demanda estimada (sem dados de estoque real).
 Dados SNIS com atraso de 1-2 anos. Demo restrito a capitais.
     """)
 

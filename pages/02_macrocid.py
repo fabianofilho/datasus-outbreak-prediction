@@ -16,7 +16,7 @@ from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="MacroCID · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Grafo MacroCID")
-badge("Rede de Co-ocorrencia CID-10 · SIM/DATASUS")
+badge("Rede de Co-ocorrência CID-10 · SIM/DATASUS")
 
 STATES = ["RJ", "SP", "MG", "BA", "CE", "PE", "RS", "PR", "GO", "AM"]
 
@@ -44,7 +44,7 @@ with st.spinner(f"Carregando SIM {state} {year}..."):
     sim_df, edges_df = load_graph_data(state, year)
 
 if edges_df.empty:
-    st.warning(f"Nao foi possivel carregar dados do SIM para {state} {year}. Verifique sua conexao ou tente outro estado/ano.")
+    st.warning(f"Não foi possível carregar dados do SIM para {state} {year}. Verifique sua conexão ou tente outro estado/ano.")
     st.stop()
 
 G_full = build_graph(edges_df)
@@ -56,7 +56,7 @@ tab1, tab2, tab3 = st.tabs(["Grafo CID-CID", "Heatmap MacroCID", "Top CIDs"])
 with tab1:
     stats = graph_summary(G)
     c1, c2, c3 = st.columns(3)
-    c1.metric("Nos (CIDs)", stats["nodes"])
+    c1.metric("Nós (CIDs)", stats["nodes"])
     c2.metric("Arestas", stats["edges"])
     c3.metric("Peso total", f"{stats.get('total_weight', 0):,}")
 
@@ -64,7 +64,7 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
-    with st.spinner("Calculando co-ocorrencias por MacroCID..."):
+    with st.spinner("Calculando co-ocorrências por MacroCID..."):
         add_macrocid_column(sim_df, cid_col="CAUSABAS" if "CAUSABAS" in sim_df.columns else sim_df.columns[0])
         matrix = build_cooccurrence(sim_df)
 
@@ -84,8 +84,8 @@ with tab2:
         x=matrix.columns.tolist(),
         y=matrix.index.tolist(),
         color_continuous_scale="Blues",
-        title="Co-ocorrencia entre MacroCIDs" + (" (normalizada)" if normalize_heatmap else " (log)"),
-        labels={"color": "proporcao" if normalize_heatmap else "log(casos)"},
+        title="Co-ocorrência entre MacroCIDs" + (" (normalizada)" if normalize_heatmap else " (log)"),
+        labels={"color": "proporção" if normalize_heatmap else "log(casos)"},
     )
     fig2.update_layout(height=600, margin=dict(l=150, r=20, t=50, b=150))
     fig2.update_xaxes(tickangle=45)

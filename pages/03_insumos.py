@@ -16,12 +16,12 @@ from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="Insumos · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Planejamento de Insumos")
-badge("Projecao de Demanda · PCDT/MS · Estimativa")
+badge("Projeção de Demanda · PCDT/MS · Estimativa")
 st.markdown(
     "<div style='background:#f0f7ff;border-left:4px solid #0047bb;border-radius:0 8px 8px 0;"
     "padding:0.75rem 1rem;font-size:0.875rem;color:#1e293b;margin-bottom:1rem'>"
-    "Demanda estimada com base em previsoes epidemiologicas. "
-    "Nao ha dados de estoque em tempo real no SUS publico."
+    "Demanda estimada com base em previsões epidemiológicas. "
+    "Não há dados de estoque em tempo real no SUS público."
     "</div>",
     unsafe_allow_html=True,
 )
@@ -36,11 +36,11 @@ DEMO_CITIES = {
 
 with st.sidebar:
     sidebar_back()
-    st.header("Configuracao")
-    doenca = st.selectbox("Doenca", DISEASES, index=0)
+    st.header("Configuração")
+    doenca = st.selectbox("Doença", DISEASES, index=0)
     horizon = st.slider("Horizonte de planejamento (semanas)", 1, 12, 4)
     cidades_sel = st.multiselect(
-        "Municipios",
+        "Municípios",
         list(DEMO_CITIES.keys()),
         default=list(DEMO_CITIES.keys())[:3],
     )
@@ -59,10 +59,10 @@ def get_forecast(geocode: str, cid: str, doenca: str, horizon: int) -> dict:
     return {"cid": cid, "casos_semana": casos}
 
 if not cidades_sel:
-    st.warning("Selecione ao menos um municipio.")
+    st.warning("Selecione ao menos um município.")
     st.stop()
 
-with st.spinner("Calculando previsoes e demanda..."):
+with st.spinner("Calculando previsões e demanda..."):
     rows = []
     for nome in cidades_sel:
         geocode, cid = DEMO_CITIES[nome]
@@ -100,9 +100,9 @@ with col1:
         st.info("Sem demanda calculada.")
 
 with col2:
-    st.subheader("Previsao de casos")
+    st.subheader("Previsão de casos")
     st.dataframe(
-        forecast_df.rename(columns={"casos_semana": "casos/semana (media)"}),
+        forecast_df.rename(columns={"casos_semana": "casos/semana (média)"}),
         use_container_width=True,
         hide_index=True,
     )
@@ -111,8 +111,8 @@ st.divider()
 
 # --- Grafico por municipio ---
 if not demand_df.empty:
-    st.subheader("Top insumos por municipio")
-    municipio_vis = st.selectbox("Municipio", demand_df["municipio"].unique())
+    st.subheader("Top insumos por município")
+    municipio_vis = st.selectbox("Município", demand_df["municipio"].unique())
     sub = demand_df[demand_df["municipio"] == municipio_vis].head(15)
 
     import plotly.express as px

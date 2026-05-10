@@ -14,8 +14,8 @@ from core.viz.timeseries import plot_series_with_forecast, plot_alert_table_bar
 from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="Surtos · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
-inject(subtitle="Vigilancia de Surtos")
-badge("Deteccao de Anomalias · Previsao 4 Semanas · InfoDengue")
+inject(subtitle="Vigilância de Surtos")
+badge("Detecção de Anomalias · Previsão 4 Semanas · InfoDengue")
 
 # Municipios de demo (geocodigos IBGE de capitais)
 DEMO_CITIES = {
@@ -33,11 +33,11 @@ DEMO_CITIES = {
 with st.sidebar:
     sidebar_back()
     st.header("Filtros")
-    doenca = st.selectbox("Doenca", DISEASES, index=0)
-    ano_inicio = st.slider("Ano de inicio", 2019, 2024, 2020)
+    doenca = st.selectbox("Doença", DISEASES, index=0)
+    ano_inicio = st.slider("Ano de início", 2019, 2024, 2020)
     ano_fim = st.slider("Ano de fim", 2020, 2024, 2024)
     cidades_sel = st.multiselect(
-        "Municipios (demo)",
+        "Municípios (demo)",
         list(DEMO_CITIES.keys()),
         default=["Rio de Janeiro (RJ)", "Sao Paulo (SP)", "Fortaleza (CE)"],
     )
@@ -48,7 +48,7 @@ def load_data(geocode: str, doenca: str, y0: int, y1: int) -> pd.DataFrame:
     return fetch_city(geocode, doenca, y0, y1)
 
 if not cidades_sel:
-    st.warning("Selecione ao menos um municipio no sidebar.")
+    st.warning("Selecione ao menos um município na barra lateral.")
     st.stop()
 
 with st.spinner("Carregando dados do InfoDengue..."):
@@ -78,18 +78,18 @@ summary_df = pd.concat(all_summaries, ignore_index=True) if all_summaries else p
 col1, col2, col3 = st.columns(3)
 with col1:
     n_vermelho = int((summary_df["nivel_alerta"] == VERMELHO).sum()) if not summary_df.empty else 0
-    st.metric("Municipios em alerta vermelho", n_vermelho)
+    st.metric("Municípios em alerta vermelho", n_vermelho)
 with col2:
     n_amarelo = int((summary_df["nivel_alerta"] == AMARELO).sum()) if not summary_df.empty else 0
-    st.metric("Municipios em alerta amarelo", n_amarelo)
+    st.metric("Municípios em alerta amarelo", n_amarelo)
 with col3:
     total_casos = int(summary_df["casos"].sum()) if not summary_df.empty and "casos" in summary_df.columns else 0
-    st.metric("Total de casos na ultima semana", f"{total_casos:,}")
+    st.metric("Total de casos na última semana", f"{total_casos:,}")
 
 st.divider()
 
 # --- Tabela de alertas ---
-st.subheader("Resumo de alertas por municipio")
+st.subheader("Resumo de alertas por município")
 if not summary_df.empty:
     def _color_row(row):
         c = alert_color(row.get("nivel_alerta", "verde"))
@@ -101,19 +101,19 @@ if not summary_df.empty:
 
     st.plotly_chart(plot_alert_table_bar(summary_df), use_container_width=True)
 else:
-    st.info("Nenhum dado de alerta disponivel para os municipios e periodo selecionados.")
+    st.info("Nenhum dado de alerta disponível para os municípios e período selecionados.")
 
 st.divider()
 
 # --- Serie temporal + previsao ---
-st.subheader("Serie temporal e previsao (4 semanas)")
+st.subheader("Série temporal e previsão (4 semanas)")
 
 if city_data:
-    municipio_sel = st.selectbox("Selecione um municipio", list(city_data.keys()))
+    municipio_sel = st.selectbox("Selecione um município", list(city_data.keys()))
     series = city_data[municipio_sel]["series"]
     alert_df = city_data[municipio_sel]["alert_df"]
 
-    with st.spinner("Calculando previsao..."):
+    with st.spinner("Calculando previsão..."):
         hist_pred = forecast_with_history(series, horizon=4)
 
         if "nivel_alerta" in alert_df.columns:
@@ -126,6 +126,6 @@ if city_data:
     with st.expander("Ver dados brutos"):
         st.dataframe(hist_pred, use_container_width=True)
 else:
-    st.info("Nenhuma serie disponivel. Verifique a conexao com o InfoDengue.")
+    st.info("Nenhuma série disponível. Verifique a conexão com o InfoDengue.")
 
 footer("Surtos")

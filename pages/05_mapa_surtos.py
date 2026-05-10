@@ -18,10 +18,10 @@ st.set_page_config(
     layout="wide",
 )
 inject(subtitle="Mapa de Surtos")
-badge("Distribuicao Geografica · InfoDengue · Capitais e Grandes Municipios")
+badge("Distribuição Geográfica · InfoDengue · Capitais e Grandes Municípios")
 st.caption(
-    "Nivel de alerta calculado por z-score rolante de 52 semanas. "
-    "Tamanho da bolha proporcional ao numero de casos na ultima semana disponivel."
+    "Nível de alerta calculado por z-score rolante de 52 semanas. "
+    "Tamanho da bolha proporcional ao número de casos na última semana disponível."
 )
 
 CIDADES: dict[str, dict] = {
@@ -54,11 +54,11 @@ NIVEL_RANK = {VERMELHO: 3, AMARELO: 2, VERDE: 1}
 with st.sidebar:
     sidebar_back()
     st.header("Filtros")
-    doenca = st.selectbox("Doenca", DISEASES, index=0)
+    doenca = st.selectbox("Doença", DISEASES, index=0)
     ano_inicio = st.slider("Ano inicio", 2019, 2024, 2021)
     ano_fim = st.slider("Ano fim", 2020, 2024, 2024)
     st.divider()
-    st.caption("Municipios sem historico minimo de 26 semanas sao omitidos.")
+    st.caption("Municípios sem histórico mínimo de 26 semanas são omitidos.")
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -91,8 +91,8 @@ with st.spinner("Carregando alertas para o mapa..."):
 
 if not rows:
     st.warning(
-        "Nenhum dado disponivel para o periodo selecionado. "
-        "Tente ampliar o intervalo de anos ou selecionar outra doenca."
+        "Nenhum dado disponível para o período selecionado. "
+        "Tente ampliar o intervalo de anos ou selecionar outra doença."
     )
     st.stop()
 
@@ -146,7 +146,7 @@ fig.update_layout(
     paper_bgcolor="#ffffff",
     font=dict(family="Inter, system-ui, sans-serif", size=12, color="#1e293b"),
     legend=dict(
-        title="Nivel de alerta",
+        title="Nível de alerta",
         orientation="v",
         x=0.01,
         y=0.98,

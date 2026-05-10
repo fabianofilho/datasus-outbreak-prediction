@@ -23,17 +23,17 @@ from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="Mapa Urbano · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Mapa Urbano")
-badge("Saneamento x Doencas · SNIS · IBGE")
+badge("Saneamento x Doenças · SNIS · IBGE")
 st.caption(
-    "Correlacao entre cobertura de saneamento basico (SNIS) e incidencia de doencas de veiculacao hidrica. "
-    "Dados SNIS com atraso de 1-2 anos - use como indicador estrutural, nao de monitoramento."
+    "Correlação entre cobertura de saneamento básico (SNIS) e incidência de doenças de veiculação hídrica. "
+    "Dados SNIS com atraso de 1-2 anos. Use como indicador estrutural, não de monitoramento."
 )
 
 with st.sidebar:
     sidebar_back()
     st.header("Filtros")
     uf_filter = st.text_input("Filtrar por UF (ex: RJ)", value="").upper().strip()
-    top_n = st.slider("Top N municipios de risco", 5, 50, 20)
+    top_n = st.slider("Top N municípios de risco", 5, 50, 20)
 
 # --- Carregar SNIS ---
 @st.cache_data(ttl=86400)
@@ -52,7 +52,7 @@ if snis_df.empty:
     n = 100
     snis_df = pd.DataFrame({
         "codigo_6d": [f"33{i:04d}" for i in range(n)],
-        "nome_municipio": [f"Municipio {i}" for i in range(n)],
+        "nome_municipio": [f"Município {i}" for i in range(n)],
         "uf": ["RJ"] * 50 + ["SP"] * 50,
         "cobertura_agua_pct": np.random.uniform(40, 100, n),
         "cobertura_esgoto_pct": np.random.uniform(10, 95, n),
@@ -76,28 +76,28 @@ else:
 if uf_filter and "uf" in snis_df.columns:
     snis_df = snis_df[snis_df["uf"].str.upper() == uf_filter]
     if snis_df.empty:
-        st.warning(f"Nenhum municipio encontrado para UF '{uf_filter}'.")
+        st.warning(f"Nenhum município encontrado para UF '{uf_filter}'.")
         st.stop()
 
 # --- KPIs ---
 c1, c2, c3 = st.columns(3)
-c1.metric("Municipios analisados", len(snis_df))
+c1.metric("Municípios analisados", len(snis_df))
 c2.metric(
-    "Cobertura media de esgoto",
+    "Cobertura média de esgoto",
     f"{snis_df['cobertura_esgoto_pct'].mean():.1f}%" if "cobertura_esgoto_pct" in snis_df.columns else "N/D",
 )
 c3.metric(
-    "Cobertura media de agua",
+    "Cobertura média de água",
     f"{snis_df['cobertura_agua_pct'].mean():.1f}%" if "cobertura_agua_pct" in snis_df.columns else "N/D",
 )
 
 if is_demo:
-    st.info("Exibindo dados sinteticos de demonstracao. A correlacao mostrada e ilustrativa.")
+    st.info("Exibindo dados sintéticos de demonstração. A correlação mostrada é ilustrativa.")
 
 st.divider()
 
 # --- Correlacao ---
-st.subheader("Correlacao: cobertura de esgoto x doencas hidricas")
+st.subheader("Correlação: cobertura de esgoto x doenças hídricas")
 corr = spearman_corr(snis_df, "cobertura_esgoto_pct", "taxa_hidrica")
 if corr["rho"] is not None:
     col_a, col_b = st.columns([1, 3])
@@ -117,8 +117,8 @@ if corr["rho"] is not None:
 st.divider()
 
 # --- Municipios de alto risco ---
-st.subheader(f"Top {top_n} municipios de maior risco")
-st.caption("Risco combinado: baixa cobertura de esgoto + alta incidencia de doencas hidricas")
+st.subheader(f"Top {top_n} municípios de maior risco")
+st.caption("Risco combinado: baixa cobertura de esgoto + alta incidência de doenças hídricas")
 
 risk_df = high_risk_municipios(
     snis_df,
@@ -144,8 +144,8 @@ if not risk_df.empty:
             orientation="h",
             color="risk_score",
             color_continuous_scale="Reds",
-            title="Score de risco por municipio",
-            labels={"risk_score": "Risco (0-1)", x_col: "Municipio"},
+            title="Score de risco por município",
+            labels={"risk_score": "Risco (0-1)", x_col: "Município"},
         )
         fig_risk.update_layout(
             height=450,
@@ -158,13 +158,13 @@ if not risk_df.empty:
 st.divider()
 
 # --- Histograma cobertura esgoto ---
-st.subheader("Distribuicao da cobertura de esgoto")
+st.subheader("Distribuição da cobertura de esgoto")
 if "cobertura_esgoto_pct" in snis_df.columns:
     fig_hist = px.histogram(
         snis_df,
         x="cobertura_esgoto_pct",
         nbins=30,
-        title="Distribuicao: cobertura de esgoto por municipio (%)",
+        title="Distribuição: cobertura de esgoto por município (%)",
         labels={"cobertura_esgoto_pct": "Cobertura de esgoto (%)"},
         color_discrete_sequence=["#1f77b4"],
     )

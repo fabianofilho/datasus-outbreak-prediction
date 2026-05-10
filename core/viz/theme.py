@@ -367,16 +367,16 @@ _HEADER_HTML = """
   </div>
   <div>
     <div class="sus-header-title">
-      Saude <span style="color:#94a3b8;font-weight:400">·</span> {subtitle}
+      Saúde <span style="color:#94a3b8;font-weight:400">·</span> {subtitle}
     </div>
-    <div class="sus-header-sub">Vigilancia Epidemiologica · DATASUS</div>
+    <div class="sus-header-sub">Vigilância Epidemiológica · DATASUS</div>
   </div>
 </div>
 """
 
 _FOOTER_HTML = """
 <div class="sus-footer">
-  <span class="sus-footer-left">Saude · {label} · dados publicos SUS</span>
+  <span class="sus-footer-left">Saúde · {label} · dados públicos SUS</span>
   <span class="sus-footer-right">InfoDengue · SIM/DATASUS · SNIS · IBGE</span>
 </div>
 """
@@ -403,7 +403,7 @@ def sidebar_back() -> None:
     """Renderiza link 'Inicio' no topo da sidebar das sub-paginas."""
     st.markdown(
         '<div class="sus-back-link">'
-        '<a href="/" target="_self">&#8592; Inicio</a>'
+        '<a href="/" target="_self">&#8592; Início</a>'
         "</div>",
         unsafe_allow_html=True,
     )
@@ -436,4 +436,4 @@ def card(content_html: str, title: str = "") -> None:
 
 
 def badge(text: str) -> None:
-    st.markdown(f'<div class="sus-badge">-- {text}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sus-badge">{text}</div>', unsafe_allow_html=True)
