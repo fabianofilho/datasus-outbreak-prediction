@@ -345,6 +345,44 @@ hr {
   color: var(--slate-400);
 }
 
+/* --- Empty state (aguardando analise) --- */
+.sus-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  margin-top: 2rem;
+  background: #ffffff;
+  border: 1.5px dashed var(--slate-200);
+  border-radius: 16px;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+.sus-empty-icon {
+  width: 52px; height: 52px;
+  background: #eff6ff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.sus-empty-icon .material-symbols-outlined {
+  font-size: 1.6rem;
+  color: var(--sus-blue);
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
+.sus-empty-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--slate-700);
+}
+.sus-empty-desc {
+  font-size: 0.78rem;
+  color: var(--slate-400);
+  max-width: 340px;
+  line-height: 1.5;
+}
+
 /* --- Animacao fade-in --- */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -425,6 +463,20 @@ def module_card(icon: str, name: str, desc: str, source: str) -> None:
   </div>
   <div class="sus-module-name">{name}</div>
   <div class="sus-module-desc">{desc}</div>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+
+def empty_state(title: str = "Configure os filtros e clique em Analisar", desc: str = "Selecione municipios, doenca e periodo na barra lateral para iniciar a analise.") -> None:
+    """Renderiza estado vazio aguardando acao do usuario."""
+    st.markdown(
+        f"""<div class="sus-empty-state">
+  <div class="sus-empty-icon">
+    <span class="material-symbols-outlined">travel_explore</span>
+  </div>
+  <div class="sus-empty-title">{title}</div>
+  <div class="sus-empty-desc">{desc}</div>
 </div>""",
         unsafe_allow_html=True,
     )

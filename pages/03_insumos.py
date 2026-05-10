@@ -8,35 +8,40 @@ AVISO: Projeta DEMANDA estimada. Nao ha dados de estoque do SUS em tempo real.
 import streamlit as st
 import pandas as pd
 
-from core.data.infodengue import fetch_city, series_for_forecast, DISEASES, DISEASE_LABELS, DISEASE_CID
+from core.data.infodengue import fetch_city, series_for_forecast, DISEASE_LABELS, DISEASE_CID
+from core.data.municipios import load as load_municipios, display_options, default_capitals
 from core.surtos.forecaster import forecast
 from core.insumos.mapping import all_insumos, cids_with_mapping
 from core.insumos.demand import project_demand, project_by_municipio
-from core.viz.theme import inject, footer, badge, sidebar_back
+from core.viz.theme import inject, footer, badge, sidebar_back, empty_state
 
-st.set_page_config(page_title="Insumos · datasus-outbreak-prediction", page_icon="🦠", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="Insumos · datasus-outbreak-prediction",
+    page_icon="🦠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 inject(subtitle="Planejamento de Insumos")
 badge("Projeção de Demanda · PCDT/MS · Estimativa")
 st.markdown(
     "<div style='background:#f0f7ff;border-left:4px solid #0047bb;border-radius:0 8px 8px 0;"
-    "padding:0.75rem 1rem;font-size:0.875rem;color:#1e293b;margin-bottom:1rem'>"
+    "padding:0.6rem 1rem;font-size:0.8rem;color:#1e293b;margin-bottom:1rem'>"
     "Demanda estimada com base em previsões epidemiológicas. "
     "Não há dados de estoque em tempo real no SUS público."
     "</div>",
     unsafe_allow_html=True,
 )
 
-DEMO_CITIES_GEO = {
-    "Rio de Janeiro (RJ)": "3304557",
-    "Sao Paulo (SP)": "3550308",
-    "Belo Horizonte (MG)": "3106200",
-    "Fortaleza (CE)": "2304400",
-    "Manaus (AM)": "1302603",
-}
+
+@st.cache_data(ttl=86400, show_spinner=False)
+def get_municipio_options() -> dict[str, str]:
+    return display_options(load_municipios())
+
 
 with st.sidebar:
     sidebar_back()
     st.header("Configuração")
+
     doenca = st.selectbox(
         "Doença",
         options=list(DISEASE_LABELS.keys()),
@@ -44,11 +49,51 @@ with st.sidebar:
         index=0,
     )
     horizon = st.slider("Horizonte de planejamento (semanas)", 1, 12, 4)
+
+    st.divider()
+    st.subheader("Municípios")
+    st.caption("Digite nome ou UF para filtrar os 5.570 municípios brasileiros.")
+
+    mun_opts = get_municipio_options()
+    caps_default = [k for k in default_capitals() if k in mun_opts]
+
     cidades_sel = st.multiselect(
-        "Municípios",
-        list(DEMO_CITIES_GEO.keys()),
-        default=list(DEMO_CITIES_GEO.keys())[:3],
+        "Selecionar municípios",
+        options=list(mun_opts.keys()),
+        default=caps_default[:3],
+        placeholder="Ex: Campinas (SP)",
     )
+
+    st.divider()
+    analisar = st.button("Analisar", type="primary", use_container_width=True)
+
+# --- Estado inicial ---
+if analisar:
+    st.session_state["insumos_ok"] = True
+    st.session_state["insumos_cfg"] = {
+        "cidades": cidades_sel,
+        "doenca": doenca,
+        "horizon": horizon,
+    }
+
+if not st.session_state.get("insumos_ok"):
+    empty_state(
+        "Configure os filtros e clique em Analisar",
+        "Selecione municípios, doença e horizonte de planejamento para projetar a demanda por insumos.",
+    )
+    footer("Insumos")
+    st.stop()
+
+cfg = st.session_state["insumos_cfg"]
+cidades_sel = cfg["cidades"]
+doenca = cfg["doenca"]
+horizon = cfg["horizon"]
+
+if not cidades_sel:
+    st.warning("Selecione ao menos um município na barra lateral e clique em Analisar.")
+    footer("Insumos")
+    st.stop()
+
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def get_forecast(geocode: str, cid: str, doenca: str, horizon: int) -> dict:
@@ -63,15 +108,14 @@ def get_forecast(geocode: str, cid: str, doenca: str, horizon: int) -> dict:
         casos = float(pred["previsao"].mean())
     return {"cid": cid, "casos_semana": casos}
 
-if not cidades_sel:
-    st.warning("Selecione ao menos um município.")
-    st.stop()
 
 with st.spinner("Calculando previsões e demanda..."):
     cid = DISEASE_CID.get(doenca, "A90")
     rows = []
     for nome in cidades_sel:
-        geocode = DEMO_CITIES_GEO[nome]
+        geocode = mun_opts.get(nome)
+        if not geocode:
+            continue
         result = get_forecast(geocode, cid, doenca, horizon)
         rows.append({"municipio": nome, "cid": cid, "casos_semana": result["casos_semana"]})
 
@@ -79,6 +123,7 @@ with st.spinner("Calculando previsões e demanda..."):
 
     if forecast_df.empty or forecast_df["casos_semana"].sum() == 0:
         st.warning("Sem previsões disponíveis. Verifique os dados.")
+        footer("Insumos")
         st.stop()
 
     demand_df = project_by_municipio(
@@ -101,7 +146,12 @@ with col1:
             hide_index=True,
         )
         csv = demand_df.to_csv(index=False).encode("utf-8")
-        st.download_button("Exportar CSV", csv, file_name=f"demanda_insumos_{horizon}sem.csv", mime="text/csv")
+        st.download_button(
+            "Exportar CSV",
+            csv,
+            file_name=f"demanda_insumos_{horizon}sem.csv",
+            mime="text/csv",
+        )
     else:
         st.info("Sem demanda calculada.")
 

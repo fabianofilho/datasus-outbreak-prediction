@@ -19,7 +19,7 @@ from core.geo.saneamento import (
     scatter_saneamento_doenca,
     high_risk_municipios,
 )
-from core.viz.theme import inject, footer, badge, sidebar_back
+from core.viz.theme import inject, footer, badge, sidebar_back, empty_state
 
 st.set_page_config(page_title="Mapa Urbano · datasus-outbreak-prediction", page_icon="🦠", layout="wide", initial_sidebar_state="expanded")
 inject(subtitle="Mapa Urbano")
@@ -31,9 +31,28 @@ st.caption(
 
 with st.sidebar:
     sidebar_back()
-    st.header("Filtros")
+    st.header("Configuração")
     uf_filter = st.text_input("Filtrar por UF (ex: RJ)", value="").upper().strip()
     top_n = st.slider("Top N municípios de risco", 5, 50, 20)
+    st.divider()
+    analisar = st.button("Analisar", type="primary", use_container_width=True)
+
+if analisar:
+    st.session_state["urbano_ok"] = True
+    st.session_state["urbano_cfg"] = {"uf_filter": uf_filter, "top_n": top_n}
+
+if not st.session_state.get("urbano_ok"):
+    empty_state(
+        "Configure os filtros e clique em Analisar",
+        "Selecione o estado (UF) para visualizar a correlação entre saneamento e doenças hídricas.",
+    )
+    footer("Mapa Urbano")
+    st.stop()
+
+cfg = st.session_state["urbano_cfg"]
+uf_filter = cfg["uf_filter"]
+top_n = cfg["top_n"]
+
 
 # --- Carregar SNIS ---
 @st.cache_data(ttl=86400)

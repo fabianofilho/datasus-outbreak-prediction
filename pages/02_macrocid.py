@@ -12,7 +12,7 @@ from core.macrocid.groups import all_group_names, label_of, color_of, add_macroc
 from core.macrocid.builder import build_graph, prune_graph, graph_summary
 from core.macrocid.cooccurrence import build_cooccurrence, normalized_cooccurrence
 from core.viz.plotly_graph import force_directed_plot, heatmap_plot
-from core.viz.theme import inject, footer, badge, sidebar_back
+from core.viz.theme import inject, footer, badge, sidebar_back, empty_state
 
 st.set_page_config(page_title="MacroCID · datasus-outbreak-prediction", page_icon="🦠", layout="wide", initial_sidebar_state="expanded")
 inject(subtitle="Grafo MacroCID")
@@ -22,13 +22,39 @@ STATES = ["RJ", "SP", "MG", "BA", "CE", "PE", "RS", "PR", "GO", "AM"]
 
 with st.sidebar:
     sidebar_back()
-    st.header("Filtros")
+    st.header("Configuração")
     state = st.selectbox("Estado", STATES, index=0)
     year = st.selectbox("Ano", list(range(2018, 2024)), index=4)
-    min_weight = st.slider("Peso minimo de aresta", 1, 50, 5)
-    top_n = st.slider("Top N nos", 20, 200, 80)
+    min_weight = st.slider("Peso mínimo de aresta", 1, 50, 5)
+    top_n = st.slider("Top N nós", 20, 200, 80)
     normalize_heatmap = st.checkbox("Normalizar heatmap", value=False)
     highlight = st.text_input("Destacar CID (ex: I21)", value="").upper().strip()
+    st.divider()
+    analisar = st.button("Analisar", type="primary", use_container_width=True)
+
+if analisar:
+    st.session_state["macrocid_ok"] = True
+    st.session_state["macrocid_cfg"] = {
+        "state": state, "year": year, "min_weight": min_weight,
+        "top_n": top_n, "normalize_heatmap": normalize_heatmap, "highlight": highlight,
+    }
+
+if not st.session_state.get("macrocid_ok"):
+    empty_state(
+        "Configure os filtros e clique em Analisar",
+        "Selecione estado e ano para carregar a rede de co-ocorrência CID-10 do SIM/DATASUS.",
+    )
+    footer("MacroCID")
+    st.stop()
+
+cfg = st.session_state["macrocid_cfg"]
+state = cfg["state"]
+year = cfg["year"]
+min_weight = cfg["min_weight"]
+top_n = cfg["top_n"]
+normalize_heatmap = cfg["normalize_heatmap"]
+highlight = cfg["highlight"]
+
 
 @st.cache_data(ttl=7200, show_spinner=False)
 def load_graph_data(state: str, year: int):
@@ -37,7 +63,7 @@ def load_graph_data(state: str, year: int):
         df = sim_mod.preprocess(raw)
         edges = sim_mod.extract_causal_chains(df)
         return df, edges
-    except Exception as e:
+    except Exception:
         return pd.DataFrame(), pd.DataFrame()
 
 with st.spinner(f"Carregando SIM {state} {year}..."):
@@ -45,6 +71,7 @@ with st.spinner(f"Carregando SIM {state} {year}..."):
 
 if edges_df.empty:
     st.warning(f"Não foi possível carregar dados do SIM para {state} {year}. Verifique sua conexão ou tente outro estado/ano.")
+    footer("MacroCID")
     st.stop()
 
 G_full = build_graph(edges_df)
