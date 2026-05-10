@@ -10,7 +10,7 @@ import plotly.express as px
 
 from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
 from core.surtos.detector import classify_alert, summary_table, VERDE, AMARELO, VERMELHO
-from core.viz.theme import inject, footer, badge
+from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(
     page_title="Mapa de Surtos · datasus-outbreak-prediction",
@@ -52,6 +52,7 @@ NIVEL_ORDER = [VERMELHO, AMARELO, VERDE]
 NIVEL_RANK = {VERMELHO: 3, AMARELO: 2, VERDE: 1}
 
 with st.sidebar:
+    sidebar_back()
     st.header("Filtros")
     doenca = st.selectbox("Doenca", DISEASES, index=0)
     ano_inicio = st.slider("Ano inicio", 2019, 2024, 2021)

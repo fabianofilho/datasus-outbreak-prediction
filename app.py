@@ -6,30 +6,22 @@ import plotly.express as px
 
 from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
 from core.surtos.detector import classify_alert, summary_table, VERDE, AMARELO, VERMELHO, alert_color
-from core.viz.theme import inject, footer, badge
+from core.viz.theme import inject, footer, badge, module_card
 
 st.set_page_config(
     page_title="datasus-outbreak-prediction",
     page_icon="🦠",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
+)
+
+# Oculta sidebar completamente na home
+st.markdown(
+    "<style>[data-testid='stSidebar']{display:none!important}</style>",
+    unsafe_allow_html=True,
 )
 
 inject(subtitle="Outbreak Prediction")
-
-# --- Sidebar ---
-with st.sidebar:
-    st.markdown("### Filtros")
-    doenca = st.selectbox("Doenca", DISEASES, index=0)
-    ano_inicio = st.slider("Ano de inicio", 2019, 2024, 2021)
-    ano_fim = st.slider("Ano de fim", 2020, 2024, 2024)
-    st.divider()
-    st.markdown("### Modulos")
-    st.page_link("pages/01_surtos.py", label="Vigilancia de Surtos")
-    st.page_link("pages/02_macrocid.py", label="Grafo MacroCID")
-    st.page_link("pages/03_insumos.py", label="Planejamento de Insumos")
-    st.page_link("pages/04_mapa_urbano.py", label="Mapa Urbano")
-    st.page_link("pages/05_mapa_surtos.py", label="Mapa de Surtos")
 
 # --- Hero ---
 badge("Plataforma de Vigilancia Epidemiologica · Dados Publicos SUS")
@@ -41,13 +33,89 @@ st.markdown(
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p style='color:#64748b;font-size:1rem;margin:0 0 1.5rem 0'>"
+    "<p style='color:#64748b;font-size:1rem;margin:0 0 1.75rem 0'>"
     "Deteccao de anomalias · Previsao LightGBM · Grafo MacroCID · Saneamento x doencas"
     "</p>",
     unsafe_allow_html=True,
 )
 
-# --- Demo: capitais ---
+# --- Cards de modulos ---
+st.markdown(
+    "<p style='font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;"
+    "letter-spacing:0.1em;margin-bottom:0.75rem'>Modulos</p>",
+    unsafe_allow_html=True,
+)
+
+MODULOS = [
+    {
+        "icon": "monitoring",
+        "name": "Vigilancia de Surtos",
+        "desc": "Deteccao de anomalias por z-score rolante e previsao de 4 semanas com LightGBM.",
+        "source": "InfoDengue",
+        "page": "pages/01_surtos.py",
+        "label": "Abrir",
+    },
+    {
+        "icon": "hub",
+        "name": "Grafo MacroCID",
+        "desc": "Rede de co-ocorrencia entre grupos de CID-10 a partir do SIM/DATASUS.",
+        "source": "SIM/DATASUS",
+        "page": "pages/02_macrocid.py",
+        "label": "Abrir",
+    },
+    {
+        "icon": "inventory_2",
+        "name": "Planejamento de Insumos",
+        "desc": "Projecao de demanda por medicamentos baseada em casos previstos por municipio.",
+        "source": "PCDT/MS",
+        "page": "pages/03_insumos.py",
+        "label": "Abrir",
+    },
+    {
+        "icon": "water",
+        "name": "Mapa Urbano",
+        "desc": "Correlacao Spearman entre cobertura de saneamento e incidencia de doencas hidricas.",
+        "source": "SNIS · IBGE",
+        "page": "pages/04_mapa_urbano.py",
+        "label": "Abrir",
+    },
+    {
+        "icon": "pin_drop",
+        "name": "Mapa de Surtos",
+        "desc": "Distribuicao geografica dos alertas nas capitais e grandes municipios do Brasil.",
+        "source": "InfoDengue",
+        "page": "pages/05_mapa_surtos.py",
+        "label": "Abrir",
+    },
+]
+
+# Linha 1: 3 cards
+row1 = st.columns(3, gap="medium")
+for col, m in zip(row1, MODULOS[:3]):
+    with col:
+        module_card(m["icon"], m["name"], m["desc"], m["source"])
+        st.markdown('<div class="sus-module-link">', unsafe_allow_html=True)
+        st.page_link(m["page"], label=f"Acessar {m['name']} →")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# Linha 2: 2 cards centrados
+_, c1, c2, _ = st.columns([0.5, 1, 1, 0.5], gap="medium")
+for col, m in zip([c1, c2], MODULOS[3:]):
+    with col:
+        module_card(m["icon"], m["name"], m["desc"], m["source"])
+        st.markdown('<div class="sus-module-link">', unsafe_allow_html=True)
+        st.page_link(m["page"], label=f"Acessar {m['name']} →")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+st.divider()
+
+# --- KPIs ao vivo ---
+st.markdown(
+    "<p style='font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;"
+    "letter-spacing:0.1em;margin-bottom:0.75rem'>Alertas ao vivo · capitais selecionadas · Dengue</p>",
+    unsafe_allow_html=True,
+)
+
 DEMO_CITIES = {
     "Rio de Janeiro": "3304557",
     "Sao Paulo": "3550308",
@@ -71,13 +139,12 @@ def load_summary(geocode: str, nome: str, doenca: str, y0: int, y1: int) -> pd.D
 with st.spinner("Carregando dados do InfoDengue..."):
     summaries = []
     for nome, gc in DEMO_CITIES.items():
-        s = load_summary(gc, nome, doenca, ano_inicio, ano_fim)
+        s = load_summary(gc, nome, "dengue", 2021, 2024)
         if not s.empty:
             summaries.append(s)
 
 summary_df = pd.concat(summaries, ignore_index=True) if summaries else pd.DataFrame()
 
-# --- KPIs ---
 c1, c2, c3, c4 = st.columns(4)
 with c1:
     n_vermelho = int((summary_df["nivel_alerta"] == VERMELHO).sum()) if not summary_df.empty else 0
@@ -89,19 +156,8 @@ with c3:
     n_verde = int((summary_df["nivel_alerta"] == VERDE).sum()) if not summary_df.empty else 0
     st.metric("Dentro do esperado", n_verde)
 with c4:
-    total_casos = int(summary_df["casos"].sum()) if not summary_df.empty and "casos" in summary_df.columns else 0
-    st.metric("Casos ultima semana", f"{total_casos:,}")
-
-st.divider()
-
-# --- Tabela de alertas ---
-st.markdown(
-    f"<div style='font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;"
-    f"letter-spacing:0.08em;margin-bottom:0.75rem'>"
-    f"Resumo de alertas &mdash; {doenca} &middot; {ano_inicio}&ndash;{ano_fim}"
-    f"</div>",
-    unsafe_allow_html=True,
-)
+    total = int(summary_df["casos"].sum()) if not summary_df.empty and "casos" in summary_df.columns else 0
+    st.metric("Casos ultima semana", f"{total:,}")
 
 if not summary_df.empty:
     cols = [c for c in ["municipio", "ultima_semana", "casos", "casos_esperados", "z_score", "nivel_alerta"]
@@ -126,12 +182,12 @@ if not summary_df.empty:
     fig.add_hline(y=1.5, line_dash="dash", line_color="#f39c12", annotation_text="Amarelo")
     fig.add_hline(y=3.0, line_dash="dash", line_color="#e74c3c", annotation_text="Vermelho")
     fig.update_layout(
-        height=360,
+        height=320,
         plot_bgcolor="#ffffff",
         paper_bgcolor="#ffffff",
         font=dict(family="Inter, system-ui, sans-serif", size=12, color="#1e293b"),
         margin=dict(l=10, r=10, t=20, b=40),
-        legend=dict(orientation="h", y=-0.2),
+        legend=dict(orientation="h", y=-0.3),
     )
     fig.update_xaxes(showgrid=False)
     fig.update_yaxes(showgrid=True, gridcolor="#f1f5f9")
@@ -148,7 +204,7 @@ antecipar surtos e apoiar planejamento em saude publica.
 
 **Fontes:** InfoDengue · SIM/DATASUS · SNIS · IBGE
 
-**Modulos:** Vigilancia de surtos · Grafo MacroCID · Planejamento de insumos · Mapa urbano
+**Modulos:** Vigilancia de surtos · Grafo MacroCID · Planejamento de insumos · Mapa urbano · Mapa de surtos
 
 **Limitacoes:** Modulo de insumos projeta demanda estimada (sem dados de estoque real).
 Dados SNIS com atraso de 1-2 anos. Demo restrito a capitais.

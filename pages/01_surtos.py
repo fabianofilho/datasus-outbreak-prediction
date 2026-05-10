@@ -11,7 +11,7 @@ from core.data.infodengue import fetch_city, fetch_state, DISEASES
 from core.surtos.detector import classify_alert, summary_table, alert_color, VERMELHO, AMARELO
 from core.surtos.forecaster import forecast_with_history
 from core.viz.timeseries import plot_series_with_forecast, plot_alert_table_bar
-from core.viz.theme import inject, footer, badge
+from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="Surtos · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Vigilancia de Surtos")
@@ -31,6 +31,7 @@ DEMO_CITIES = {
 
 # --- Sidebar ---
 with st.sidebar:
+    sidebar_back()
     st.header("Filtros")
     doenca = st.selectbox("Doenca", DISEASES, index=0)
     ano_inicio = st.slider("Ano de inicio", 2019, 2024, 2020)

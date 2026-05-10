@@ -14,6 +14,7 @@ import streamlit as st
 
 _CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital@1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0');
 
 :root {
   --sus-blue   : #0047bb;
@@ -93,7 +94,7 @@ html, body, [class*="css"] {
   margin-bottom: 0.5rem;
 }
 
-/* --- Cards --- */
+/* --- Cards genericos --- */
 .sus-card {
   background: #ffffff;
   border: 1px solid var(--slate-200);
@@ -110,6 +111,82 @@ html, body, [class*="css"] {
   letter-spacing: 0.07em;
   margin-bottom: 0.5rem;
 }
+
+/* --- Cards de modulo (navegacao home) --- */
+.sus-module-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem 0.9rem;
+  margin-bottom: 0.25rem;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.12s, box-shadow 0.12s;
+  animation: fadeIn 0.35s ease-in-out;
+}
+.sus-module-card:hover {
+  border-color: var(--sus-blue);
+  box-shadow: 0 2px 8px rgba(0,71,187,0.08);
+}
+.sus-module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sus-module-icon {
+  width: 32px; height: 32px;
+  background: #eff6ff;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+}
+.sus-module-icon .material-symbols-outlined {
+  font-size: 1.1rem;
+  color: var(--sus-blue);
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+}
+.sus-module-source {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--slate-400);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--slate-100);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.sus-module-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-900);
+  line-height: 1.3;
+}
+.sus-module-desc {
+  font-size: 0.72rem;
+  color: var(--slate-500);
+  line-height: 1.45;
+  flex: 1;
+}
+
+/* page_link estilizado como botao de modulo */
+.sus-module-link a {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  color: var(--sus-blue) !important;
+  text-decoration: none !important;
+  padding: 4px 0 !important;
+  border: none !important;
+  background: transparent !important;
+  transition: opacity 0.12s;
+}
+.sus-module-link a:hover { opacity: 0.7; }
+
+/* esconde o nav automatico do Streamlit na sidebar */
+[data-testid="stSidebarNav"] { display: none !important; }
 
 /* --- Metricas --- */
 div[data-testid="metric-container"] {
@@ -172,6 +249,21 @@ div[data-testid="metric-container"] [data-testid="stMetricValue"] {
   text-transform: uppercase !important;
   letter-spacing: 0.1em !important;
 }
+
+/* link "voltar" na sidebar */
+.sus-back-link a {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  color: var(--slate-500) !important;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0 12px;
+  border-bottom: 1px solid var(--slate-200);
+  margin-bottom: 1rem;
+}
+.sus-back-link a:hover { color: var(--sus-blue) !important; }
 
 /* --- Botoes --- */
 .stButton button {
@@ -289,7 +381,6 @@ _FOOTER_HTML = """
 </div>
 """
 
-
 _FAVICON_LINK = (
     '<link rel="shortcut icon" href="data:image/svg+xml,'
     "%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%2032%2032'%3E"
@@ -306,6 +397,33 @@ def inject(subtitle: str = "Outbreak Prediction", footer_label: str = "V1.0") ->
     st.markdown(f"<style>{_CSS}</style>", unsafe_allow_html=True)
     st.markdown(_FAVICON_LINK, unsafe_allow_html=True)
     st.markdown(_HEADER_HTML.format(subtitle=subtitle), unsafe_allow_html=True)
+
+
+def sidebar_back() -> None:
+    """Renderiza link 'Inicio' no topo da sidebar das sub-paginas."""
+    st.markdown(
+        '<div class="sus-back-link">'
+        '<a href="/" target="_self">&#8592; Inicio</a>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+
+def module_card(icon: str, name: str, desc: str, source: str) -> None:
+    """Renderiza card de modulo (sem botao - use st.page_link abaixo)."""
+    st.markdown(
+        f"""<div class="sus-module-card">
+  <div class="sus-module-header">
+    <div class="sus-module-icon">
+      <span class="material-symbols-outlined">{icon}</span>
+    </div>
+    <span class="sus-module-source">{source}</span>
+  </div>
+  <div class="sus-module-name">{name}</div>
+  <div class="sus-module-desc">{desc}</div>
+</div>""",
+        unsafe_allow_html=True,
+    )
 
 
 def footer(label: str = "V1.0") -> None:

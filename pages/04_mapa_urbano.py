@@ -19,7 +19,7 @@ from core.geo.saneamento import (
     scatter_saneamento_doenca,
     high_risk_municipios,
 )
-from core.viz.theme import inject, footer, badge
+from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="Mapa Urbano · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Mapa Urbano")
@@ -30,6 +30,7 @@ st.caption(
 )
 
 with st.sidebar:
+    sidebar_back()
     st.header("Filtros")
     uf_filter = st.text_input("Filtrar por UF (ex: RJ)", value="").upper().strip()
     top_n = st.slider("Top N municipios de risco", 5, 50, 20)

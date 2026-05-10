@@ -12,7 +12,7 @@ from core.macrocid.groups import all_group_names, label_of, color_of, add_macroc
 from core.macrocid.builder import build_graph, prune_graph, graph_summary
 from core.macrocid.cooccurrence import build_cooccurrence, normalized_cooccurrence
 from core.viz.plotly_graph import force_directed_plot, heatmap_plot
-from core.viz.theme import inject, footer, badge
+from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="MacroCID · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Grafo MacroCID")
@@ -21,6 +21,7 @@ badge("Rede de Co-ocorrencia CID-10 · SIM/DATASUS")
 STATES = ["RJ", "SP", "MG", "BA", "CE", "PE", "RS", "PR", "GO", "AM"]
 
 with st.sidebar:
+    sidebar_back()
     st.header("Filtros")
     state = st.selectbox("Estado", STATES, index=0)
     year = st.selectbox("Ano", list(range(2018, 2024)), index=4)

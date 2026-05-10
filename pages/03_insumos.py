@@ -12,7 +12,7 @@ from core.data.infodengue import fetch_city, series_for_forecast, DISEASES
 from core.surtos.forecaster import forecast
 from core.insumos.mapping import all_insumos, cids_with_mapping
 from core.insumos.demand import project_demand, project_by_municipio
-from core.viz.theme import inject, footer, badge
+from core.viz.theme import inject, footer, badge, sidebar_back
 
 st.set_page_config(page_title="Insumos · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Planejamento de Insumos")
@@ -35,6 +35,7 @@ DEMO_CITIES = {
 }
 
 with st.sidebar:
+    sidebar_back()
     st.header("Configuracao")
     doenca = st.selectbox("Doenca", DISEASES, index=0)
     horizon = st.slider("Horizonte de planejamento (semanas)", 1, 12, 4)
