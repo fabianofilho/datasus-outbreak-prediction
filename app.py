@@ -10,7 +10,7 @@ from core.viz.theme import inject, footer, badge
 
 st.set_page_config(
     page_title="datasus-outbreak-prediction",
-    page_icon=None,
+    page_icon="🦠",
     layout="wide",
     initial_sidebar_state="expanded",
 )

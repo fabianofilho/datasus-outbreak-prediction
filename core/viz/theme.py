@@ -290,9 +290,21 @@ _FOOTER_HTML = """
 """
 
 
+_FAVICON_LINK = (
+    '<link rel="shortcut icon" href="data:image/svg+xml,'
+    "%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%2032%2032'%3E"
+    "%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'6'%20fill%3D'%230047bb'/%3E"
+    "%3Cpolyline%20points%3D'3%2C16%208%2C16%2011%2C8%2014%2C24%2017%2C12%2020%2C20%2023%2C16%2029%2C16'"
+    "%20fill%3D'none'%20stroke%3D'white'%20stroke-width%3D'2.5'"
+    "%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'/%3E%3C/svg%3E"
+    '">'
+)
+
+
 def inject(subtitle: str = "Outbreak Prediction", footer_label: str = "V1.0") -> None:
-    """Injeta CSS e renderiza header/footer do design system."""
+    """Injeta CSS, favicon e renderiza header do design system."""
     st.markdown(f"<style>{_CSS}</style>", unsafe_allow_html=True)
+    st.markdown(_FAVICON_LINK, unsafe_allow_html=True)
     st.markdown(_HEADER_HTML.format(subtitle=subtitle), unsafe_allow_html=True)
 
 

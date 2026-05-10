@@ -14,7 +14,7 @@ from core.insumos.mapping import all_insumos, cids_with_mapping
 from core.insumos.demand import project_demand, project_by_municipio
 from core.viz.theme import inject, footer, badge
 
-st.set_page_config(page_title="Insumos · datasus-outbreak-prediction", layout="wide")
+st.set_page_config(page_title="Insumos · datasus-outbreak-prediction", page_icon="🦠", layout="wide")
 inject(subtitle="Planejamento de Insumos")
 badge("Projecao de Demanda · PCDT/MS · Estimativa")
 st.markdown(
