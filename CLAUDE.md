@@ -24,15 +24,12 @@ Detecta surtos, preve demanda por insumos e correlaciona doencas com infraestrut
 - skforecast + lightgbm: previsao de series temporais
 - networkx + plotly: grafos interativos
 - datasus-dbc + dbfread: descompressao DBC
-- pysus: acesso alternativo a dados do SUS
-- folium: mapas geograficos
 - streamlit: interface web
 
 ## Fontes de dados
 | Fonte | Sistema | Acesso |
 |-------|---------|--------|
 | SIM/DATASUS | Mortalidade | FTP + HTTP mirror |
-| SIH/DATASUS | Hospitalizacoes | pysus |
 | InfoDengue | Dengue/arboviroses | API REST publica |
 | SNIS | Saneamento | CSV download |
 | IBGE | Demografico + shapefile | API + GeoJSON |
