@@ -55,7 +55,7 @@ def forecast(
         estimator = LGBMRegressor(random_state=42, verbosity=-1, n_estimators=200)
 
     lags = min(lags, len(series) // 2)
-    # skforecast >= 0.19 recebe o modelo em estimator= (regressor= foi removido na 0.25)
+    # skforecast >= 0.19 recebe o modelo em estimator= (o alias regressor= saiu na 0.22)
     forecaster = ForecasterRecursive(estimator=estimator, lags=lags)
     forecaster.fit(y=series)
 
