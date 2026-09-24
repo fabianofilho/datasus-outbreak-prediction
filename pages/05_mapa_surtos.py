@@ -181,7 +181,8 @@ c4.metric("Dentro do esperado",   int((map_df["nivel_alerta"] == VERDE).sum()))
 st.divider()
 
 # --- Mapa ---
-fig = px.scatter_mapbox(
+# scatter_map (MapLibre) substitui scatter_mapbox, removido no plotly 7
+fig = px.scatter_map(
     map_df,
     lat="lat", lon="lon",
     color="nivel_alerta",
@@ -194,7 +195,7 @@ fig = px.scatter_mapbox(
     },
     color_discrete_map=COLOR_MAP,
     category_orders={"nivel_alerta": NIVEL_ORDER},
-    mapbox_style="carto-positron",
+    map_style="carto-positron",
     zoom=3.5,
     center={"lat": -14.5, "lon": -51.0},
     size_max=45,

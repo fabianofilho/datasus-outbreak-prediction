@@ -83,6 +83,27 @@ def spearman_corr(
     return {"rho": round(rho, 3), "p_value": round(p, 4), "interpretacao": interp}
 
 
+def linha_tendencia(
+    x: pd.Series,
+    y: pd.Series,
+) -> tuple[np.ndarray, np.ndarray, float, float] | None:
+    """Ajusta y = a*x + b por minimos quadrados (numpy.polyfit).
+
+    Retorna (x_reta, y_reta, a, b) com os extremos de x, ou None quando ha
+    menos de 2 pontos validos ou x e constante.
+    """
+    xv = pd.to_numeric(x, errors="coerce").to_numpy(dtype=float)
+    yv = pd.to_numeric(y, errors="coerce").to_numpy(dtype=float)
+    ok = np.isfinite(xv) & np.isfinite(yv)
+    xv, yv = xv[ok], yv[ok]
+    if len(xv) < 2 or np.ptp(xv) == 0:
+        return None
+
+    inclinacao, intercepto = np.polyfit(xv, yv, 1)
+    x_reta = np.array([xv.min(), xv.max()])
+    return x_reta, intercepto + inclinacao * x_reta, float(inclinacao), float(intercepto)
+
+
 def scatter_saneamento_doenca(
     df: pd.DataFrame,
     x_col: str = "cobertura_esgoto_pct",
@@ -103,7 +124,6 @@ def scatter_saneamento_doenca(
         x=x_col,
         y=y_col,
         hover_name=municipio_col if municipio_col in valid.columns else None,
-        trendline="ols",
         labels={
             x_col: "Cobertura de esgoto (%)",
             y_col: "Taxa doencas hidricas (casos/100k hab)",
@@ -111,6 +131,24 @@ def scatter_saneamento_doenca(
         title=title,
         color_discrete_sequence=["#1f77b4"],
     )
+
+    # Reta de minimos quadrados via numpy.polyfit, no lugar de trendline="ols",
+    # que exige statsmodels so para desenhar uma linha
+    reta = linha_tendencia(valid[x_col], valid[y_col])
+    if reta is not None:
+        x_reta, y_reta, inclinacao, intercepto = reta
+        fig.add_trace(go.Scatter(
+            x=x_reta,
+            y=y_reta,
+            mode="lines",
+            name="Tendencia linear",
+            showlegend=False,
+            line=dict(color="#1f77b4"),
+            hovertemplate=(
+                f"<b>Tendencia linear</b><br>y = {inclinacao:.3f} x + {intercepto:.3f}"
+                "<extra></extra>"
+            ),
+        ))
 
     corr = spearman_corr(df, x_col, y_col)
     if corr["rho"] is not None:
