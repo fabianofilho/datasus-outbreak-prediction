@@ -58,14 +58,19 @@ leptospirose, febre_tifoide, influenza_a, srag
   centro do Brasil - issue conhecida, ver TODO
 
 ## Streamlit Cloud
-- `datasus_dbc` e `dbfread` NAO tem wheel para Linux: usar sempre dentro de
-  `try/except ModuleNotFoundError` e retornar `pd.DataFrame()` no except
+- `datasus-dbc` e `dbfread` estao declarados no requirements.txt: datasus-dbc
+  0.1.3 tem wheel manylinux de cp38 a cp312 e dbfread e Python puro. Para
+  Python >= 3.13 nao ha wheel (compilar exige Rust), por isso o requirements
+  usa o marcador `python_version < "3.13"` e o import em `downloader.py`
+  continua dentro de `try/except ModuleNotFoundError`, retornando
+  `pd.DataFrame()` no except
 - `data/cache/` esta no .gitignore; cache e recriado em runtime
-- Mapa usa `carto-positron` do Plotly (sem token Mapbox)
+- Mapa usa `px.scatter_map` (MapLibre) com `carto-positron` (sem token Mapbox)
 
 ## Limitacoes conhecidas e documentadas
 - Insumos: projeta DEMANDA, nao estoque real (sem API de estoque SUS publica)
-- SINAN: dados reais em DBC/FTP, incompativel com Streamlit Cloud; usar sintetico
+- SINAN: doencas nao arbovirais usam serie sintetica. A leitura de DBC funciona
+  no Linux; trocar por SINAN real e decisao de produto ainda nao tomada
 - SNIS: atraso de 1-2 anos; usar como indicador estrutural, nao operacional
 - SIM/DATASUS (pagina MacroCID): pode falhar no Streamlit Cloud por FTP
 
@@ -74,3 +79,4 @@ leptospirose, febre_tifoide, influenza_a, srag
 - networkx + plotly: grafos interativos
 - streamlit: interface web
 - requests: InfoDengue API + IBGE API
+- datasus-dbc + dbfread: descompressao DBC do SIM (pagina MacroCID)
