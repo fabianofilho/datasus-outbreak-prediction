@@ -1,7 +1,8 @@
 [server]
 headless = true
-enableCORS = false
-enableXsrfProtection = false
+# App publico: manter CORS e protecao XSRF ligados (padrao do Streamlit)
+enableCORS = true
+enableXsrfProtection = true
 
 [theme]
 base = "light"
@@ -12,4 +13,6 @@ textColor = "#1e293b"
 font = "sans serif"
 
 [client]
-showErrorDetails = true
+# Nao mostrar traceback com caminhos internos ao visitante; o detalhe
+# continua no log do servidor
+showErrorDetails = false
