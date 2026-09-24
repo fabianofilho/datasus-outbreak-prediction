@@ -40,6 +40,21 @@ def sem_rede(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def erros_detalhados():
+    """Traceback completo no AppTest para diagnosticar falhas dos testes.
+
+    O pytest roda na raiz do repo e carrega .streamlit/config.toml, que
+    esconde o traceback do visitante. Aqui o detalhe volta so nos testes.
+    """
+    from streamlit import config
+
+    anterior = config.get_option("client.showErrorDetails")
+    config.set_option("client.showErrorDetails", "full")
+    yield
+    config.set_option("client.showErrorDetails", anterior)
+
+
+@pytest.fixture(autouse=True)
 def cache_streamlit_limpo():
     """Evita que st.cache_data vaze resultados de um teste para outro."""
     import streamlit as st

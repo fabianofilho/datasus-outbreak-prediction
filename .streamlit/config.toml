@@ -14,5 +14,7 @@ font = "sans serif"
 
 [client]
 # Nao mostrar traceback com caminhos internos ao visitante; o detalhe
-# continua no log do servidor
-showErrorDetails = false
+# continua no log do servidor. Usar "type" e nao false: o valor legado
+# false equivale a "stacktrace" e ainda envia o traceback ao navegador.
+# Para depurar localmente: streamlit run app.py --client.showErrorDetails=full
+showErrorDetails = "type"
