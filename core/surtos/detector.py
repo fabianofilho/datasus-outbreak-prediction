@@ -23,6 +23,11 @@ VERMELHO = "vermelho"
 
 _ALERT_COLORS = {VERDE: "#2ecc71", AMARELO: "#f39c12", VERMELHO: "#e74c3c"}
 
+# Gravidade do alerta para ordenacao (maior = mais grave)
+NIVEL_RANK = {VERMELHO: 3, AMARELO: 2, VERDE: 1}
+
+RANKING_COLS = ["municipio", "uf", "nivel_alerta", "casos", "z_score"]
+
 
 def alert_color(nivel: str) -> str:
     return _ALERT_COLORS.get(nivel, "#95a5a6")
@@ -118,6 +123,26 @@ def classify_alert(
     result.loc[result["alarme_cusum"] & (result["nivel_alerta"] == AMARELO), "nivel_alerta"] = VERMELHO
 
     return result
+
+
+def ranking_alertas(df: pd.DataFrame) -> pd.DataFrame:
+    """Tabela de ranking do Mapa de Surtos.
+
+    Ordena por gravidade do alerta (vermelho, amarelo, verde) e, dentro do
+    mesmo nivel, por casos em ordem decrescente. A ordenacao acontece antes
+    de recortar as colunas de exibicao, que nao incluem o rank.
+    Nivel desconhecido conta como verde.
+    """
+    rank = df["nivel_alerta"].map(NIVEL_RANK).fillna(NIVEL_RANK[VERDE])
+    ordenado = (
+        df.assign(_rank=rank)
+        .sort_values(["_rank", "casos"], ascending=False, kind="stable")
+    )
+    display = ordenado[RANKING_COLS].reset_index(drop=True)
+    display["nivel_alerta"] = display["nivel_alerta"].str.upper()
+    display["z_score"] = display["z_score"].round(2)
+    display["casos"] = display["casos"].astype(int)
+    return display
 
 
 def summary_table(df: pd.DataFrame, municipio: str, doenca: str) -> pd.DataFrame:
