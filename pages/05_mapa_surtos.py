@@ -6,7 +6,9 @@ import plotly.express as px
 
 from core.data.infodengue import fetch_city, series_for_forecast, DISEASE_LABELS
 from core.data.municipios import load as load_municipios, display_options, default_capitals
-from core.surtos.detector import classify_alert, summary_table, VERDE, AMARELO, VERMELHO
+from core.surtos.detector import (
+    classify_alert, summary_table, ranking_alertas, NIVEL_RANK, VERDE, AMARELO, VERMELHO,
+)
 from core.viz.theme import inject, footer, badge, sidebar_back, empty_state
 
 st.set_page_config(
@@ -24,7 +26,6 @@ st.caption(
 
 COLOR_MAP = {VERDE: "#2ecc71", AMARELO: "#f39c12", VERMELHO: "#e74c3c"}
 NIVEL_ORDER = [VERMELHO, AMARELO, VERDE]
-NIVEL_RANK  = {VERMELHO: 3, AMARELO: 2, VERDE: 1}
 
 # Coordenadas fixas para municipios conhecidos (evita chamadas lentas de API)
 _COORDS_FIXAS: dict[str, tuple[float, float]] = {
@@ -181,7 +182,8 @@ c4.metric("Dentro do esperado",   int((map_df["nivel_alerta"] == VERDE).sum()))
 st.divider()
 
 # --- Mapa ---
-fig = px.scatter_mapbox(
+# scatter_map (MapLibre) substitui scatter_mapbox, removido no plotly 7
+fig = px.scatter_map(
     map_df,
     lat="lat", lon="lon",
     color="nivel_alerta",
@@ -194,7 +196,7 @@ fig = px.scatter_mapbox(
     },
     color_discrete_map=COLOR_MAP,
     category_orders={"nivel_alerta": NIVEL_ORDER},
-    mapbox_style="carto-positron",
+    map_style="carto-positron",
     zoom=3.5,
     center={"lat": -14.5, "lon": -51.0},
     size_max=45,
@@ -219,11 +221,7 @@ st.divider()
 
 # --- Tabela ---
 st.subheader("Ranking de alertas")
-display = map_df[["municipio", "uf", "nivel_alerta", "casos", "z_score"]].copy()
-display = display.sort_values("nivel_rank" if "nivel_rank" in map_df.columns else "casos", ascending=False)
-display["nivel_alerta"] = display["nivel_alerta"].str.upper()
-display["z_score"]      = display["z_score"].round(2)
-display["casos"]        = display["casos"].astype(int)
+display = ranking_alertas(map_df)
 
 
 def _row_style(row):
